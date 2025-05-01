@@ -14,6 +14,8 @@ import { LanguageProvider } from './contexts/LanguageContext';
 import { FloatingButtons } from './components/common/FloatingButtons';
 import { Rules } from './pages/Rules';
 import { MyBookings } from './pages/MyBookings';
+import RegisterForm from './components/forms/RegisterForm'
+import BookingForm from './components/forms/BookingForm';
 export function App() {
   return <LanguageProvider>
       <BrowserRouter>
@@ -22,6 +24,8 @@ export function App() {
           <main className="flex-grow">
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/booking-form" element={<BookingForm tours={[]} onSubmit={async () => Promise.resolve()} />} />
+              <Route path="/register" element={<RegisterForm/>} />
               <Route path="/about" element={<About />} />
               <Route path="/tours" element={<Tours />} />
               <Route path="/tours/:id" element={<TourDetail />} />

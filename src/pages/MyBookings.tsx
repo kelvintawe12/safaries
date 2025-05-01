@@ -1,9 +1,12 @@
 import React, { useState, createElement } from 'react';
 import { Button } from '../components/common/Button';
+import { Link } from 'react-router-dom';
 import { LoadingState } from '../components/common/LoadingState';
 import { generateReceipt } from '../utils/receipt';
 import { DownloadIcon, FileTextIcon } from 'lucide-react';
 import type { Booking, Receipt } from '../types';
+import { FloatingButton } from '../components/common/FloatingButton';
+
 export const MyBookings = () => {
   const [isLoading, setIsLoading] = useState(false);
   // Mock bookings data - in a real app, this would come from an API
@@ -68,7 +71,9 @@ export const MyBookings = () => {
                 You haven't made any bookings yet. Start exploring our tours to
                 plan your adventure!
               </p>
-              <Button href="/tours">Browse Tours</Button>
+              <Link to="/tours" className="inline-block bg-coral-500 text-white px-4 py-2 rounded hover:bg-coral-600 transition-colors">
+                Browse Tours
+              </Link>
             </div> : <div className="space-y-6">
               {bookings.map(booking => <div key={booking.id} className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
                   <div className="p-6">
@@ -100,5 +105,6 @@ export const MyBookings = () => {
             </div>}
         </div>
       </section>
+      <FloatingButton />
     </div>;
 };

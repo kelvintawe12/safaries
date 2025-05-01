@@ -58,7 +58,7 @@ export const Header = () => {
               <span className="uppercase">{language}</span>
             </button>
           </div>
-          <Link to="/contact" className="bg-teal-700 hover:bg-teal-800 text-white px-4 py-2 rounded-md transition-colors">
+          <Link to="/booking-entry" className="bg-teal-700 hover:bg-teal-800 text-white px-4 py-2 rounded-md transition-colors">
             Book Now
           </Link>
         </div>
@@ -109,7 +109,7 @@ export const Header = () => {
                   <GlobeIcon className="h-5 w-5 mr-1" />
                   <span className="uppercase">{language}</span>
                 </button>
-                <Link to="/contact" className="bg-teal-700 text-white px-4 py-2 rounded-md" onClick={() => setIsMenuOpen(false)}>
+                <Link to="/booking-entry" className="bg-teal-700 text-white px-4 py-2 rounded-md" onClick={() => setIsMenuOpen(false)}>
                   Book Now
                 </Link>
               </div>

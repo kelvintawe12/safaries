@@ -47,7 +47,9 @@ export const BookingForm = ({
                 {tour.title} - ${tour.price}
               </option>)}
           </select>
-          {errors.tourId && <p className="mt-1 text-sm text-red-600">{errors.tourId.message}</p>}
+          {errors.tourId && typeof errors.tourId.message === 'string' && (
+            <p className="mt-1 text-sm text-red-600">{errors.tourId.message}</p>
+          )}
         </div>
         {/* Number of Participants */}
         <div>
@@ -60,9 +62,11 @@ export const BookingForm = ({
             valueAsNumber: true
           })} className="pl-10 w-full rounded-md border border-gray-300 px-3 py-2" />
           </div>
-          {errors.participants && <p className="mt-1 text-sm text-red-600">
+          {errors.participants && typeof errors.participants.message === 'string' && (
+            <p className="mt-1 text-sm text-red-600">
               {errors.participants.message}
-            </p>}
+            </p>
+          )}
         </div>
         {/* Tour Date */}
         <div>
@@ -74,7 +78,7 @@ export const BookingForm = ({
             <input type="date" {...register('tourDate')} className="pl-10 w-full rounded-md border border-gray-300 px-3 py-2" min={new Date().toISOString().split('T')[0]} />
           </div>
           {errors.tourDate && <p className="mt-1 text-sm text-red-600">
-              {errors.tourDate.message}
+              {typeof errors.tourDate.message === 'string' && errors.tourDate.message}
             </p>}
         </div>
         {/* Payment Method */}
@@ -92,7 +96,7 @@ export const BookingForm = ({
             </select>
           </div>
           {errors.paymentMethod && <p className="mt-1 text-sm text-red-600">
-              {errors.paymentMethod.message}
+              {typeof errors.paymentMethod.message === 'string' && errors.paymentMethod.message}
             </p>}
         </div>
         {/* Special Requests */}
@@ -126,7 +130,7 @@ export const BookingForm = ({
             </span>
           </label>
           {errors.depositPaid && <p className="mt-1 text-sm text-red-600">
-              {errors.depositPaid.message}
+              {typeof errors.depositPaid?.message === 'string' ? errors.depositPaid.message : ''}
             </p>}
         </div>
       </div>
@@ -137,3 +141,5 @@ export const BookingForm = ({
       </div>
     </form>;
 };
+
+export default BookingForm;

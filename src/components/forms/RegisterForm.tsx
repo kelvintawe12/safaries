@@ -15,13 +15,23 @@ export const RegisterForm = () => {
       errors,
       isSubmitting
     }
-  } = useForm({
+  } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema)
   });
-  const onSubmit = async data => {
+  interface RegisterFormData {
+    fullName: string;
+    email: string;
+    phoneNumber: string;
+    preferredLanguage: string;
+    password: string;
+    confirmPassword: string;
+    consent: boolean;
+  }
+
+  const onSubmit = async (data: RegisterFormData): Promise<void> => {
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await new Promise<void>(resolve => setTimeout(resolve, 1500));
       console.log('Form submitted:', data);
       // TODO: Handle registration success
     } catch (error) {
@@ -102,3 +112,5 @@ export const RegisterForm = () => {
       </div>
     </form>;
 };
+
+export default RegisterForm;

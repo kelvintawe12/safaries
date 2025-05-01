@@ -1,11 +1,20 @@
 import React, { useState } from 'react';
-import { MessageCircleIcon, HelpCircleIcon, LifeBuoyIcon, XIcon } from 'lucide-react';
+import { MessageCircleIcon, HelpCircleIcon, LifeBuoyIcon, XIcon, PlusIcon } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useLocation, useNavigate } from 'react-router-dom';
+
 export const FloatingButtons = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const {
     t
   } = useLanguage();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleMyBookingsClick = () => {
+    navigate('/tours');
+  };
+
   return <div className="fixed bottom-8 right-8 z-50">
       <div className="flex flex-col items-end space-y-4">
         {/* Chat Window */}
@@ -35,6 +44,9 @@ export const FloatingButtons = () => {
           <button onClick={() => window.location.href = '/contact'} className="bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-colors" aria-label="Support">
             <LifeBuoyIcon className="h-6 w-6" />
           </button>
+          {location.pathname === '/my-bookings' && <button onClick={handleMyBookingsClick} className="bg-green-600 text-white p-3 rounded-full shadow-lg hover:bg-green-700 transition-colors" aria-label="Add Booking">
+            <PlusIcon className="h-6 w-6" />
+          </button>}
         </div>
       </div>
     </div>;
