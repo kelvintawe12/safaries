@@ -12,11 +12,13 @@ import { Contact } from './pages/Contact';
 import { NotFound } from './pages/NotFound';
 import { LanguageProvider } from './contexts/LanguageContext';
 import  FloatingButtons  from './components/common/FloatingButtons';
+import WelcomePopup from './components/common/WelcomePopup';
 import { Rules } from './pages/Rules';
 import  MyBookings  from './pages/MyBookings';
 import RegisterForm from './components/forms/RegisterForm'
 import BookingForm from './components/forms/BookingForm';
 import  BookingEntry  from './pages/BookingEntry';
+import { Gallery } from './pages/Gallery';
 
 export function App() {
   return <LanguageProvider>
@@ -37,11 +39,13 @@ export function App() {
               <Route path="/faq" element={<FAQ />} />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/contact" element={<Contact />} />
+              <Route path="/gallery" element={<Gallery />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
           <Footer />
           <FloatingButtons />
+          <WelcomePopup />
         </div>
       </BrowserRouter>
     </LanguageProvider>;

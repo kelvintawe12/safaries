@@ -47,6 +47,11 @@ export const Header = () => {
         }) => isActive ? 'text-teal-700 font-medium' : 'text-gray-700 hover:text-teal-700 transition-colors'}>
             Contact
           </NavLink>
+          <NavLink to="/gallery" className={({
+          isActive
+        }) => isActive ? 'text-teal-700 font-medium' : 'text-gray-700 hover:text-teal-700 transition-colors'}>
+            Gallery
+          </NavLink>
         </nav>
         <div className="hidden md:flex items-center space-x-4">
           <div className="relative">
@@ -100,6 +105,11 @@ export const Header = () => {
             isActive
           }) => isActive ? 'text-teal-700 font-medium' : 'text-gray-700'} onClick={() => setIsMenuOpen(false)}>
                 Contact
+              </NavLink>
+              <NavLink to="/gallery" className={({
+            isActive
+          }) => isActive ? 'text-teal-700 font-medium' : 'text-gray-700'} onClick={() => setIsMenuOpen(false)}>
+                Gallery
               </NavLink>
               <div className="pt-2 flex items-center justify-between">
                 <button className="flex items-center text-gray-700" onClick={() => {
