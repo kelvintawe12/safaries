@@ -1,16 +1,17 @@
-
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { tours } from '../data/tours';
+import { tours, Tour, Booking, Receipt, ClientDetails } from '../types'; // Import from index.ts
 import { generateReceipt } from '../utils/receipt';
 import { LoadingState } from '../components/common/LoadingState';
 import { LanguageContext } from '../contexts/LanguageContext';
-import { Tour, Booking, Receipt, TourDetails } from '../types';
 
-interface ClientDetails {
-  name: string;
-  email: string;
-  phone: string;
+type Language = 'en' | 'fr' | 'rw';
+
+// Extend Receipt type to include specialRequests
+interface ExtendedReceipt extends Receipt {
+  tourDetails: Receipt['tourDetails'] & {
+    specialRequests?: string;
+  };
 }
 
 const sendEmailInvitation = async (data: {
@@ -18,6 +19,12 @@ const sendEmailInvitation = async (data: {
   recipientEmail: string;
   tour: Tour;
 }): Promise<{ success: boolean; message: string }> => {
+  if (!data.senderName.trim()) {
+    throw new Error('Sender name is required');
+  }
+  if (!data.recipientEmail.match(/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/)) {
+    throw new Error('Invalid recipient email');
+  }
   await new Promise((resolve) => setTimeout(resolve, 1000));
   if (data.recipientEmail === 'fail@example.com') {
     throw new Error('Failed to send invitation');
@@ -25,34 +32,40 @@ const sendEmailInvitation = async (data: {
   return { success: true, message: `Invitation sent to ${data.recipientEmail}` };
 };
 
-const RegisterForm = ({ onProceed, onRegister }: { onProceed: () => void; onRegister: (data: ClientDetails) => void }) => {
+const RegisterForm = ({
+  onProceed,
+  onRegister,
+}: {
+  onProceed: () => void;
+  onRegister: (data: ClientDetails) => void;
+}) => {
   const [formData, setFormData] = useState<ClientDetails>({ name: '', email: '', phone: '' });
   const [errors, setErrors] = useState<Partial<ClientDetails>>({});
   const [touched, setTouched] = useState<Partial<Record<keyof ClientDetails, boolean>>>({});
 
-  const validate = (data: ClientDetails): Partial<ClientDetails> => {
+  const validate = useCallback((data: ClientDetails): Partial<ClientDetails> => {
     const newErrors: Partial<ClientDetails> = {};
     if (!data.name.trim()) newErrors.name = 'Full name is required';
     if (!data.email.match(/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/)) newErrors.email = 'Valid email is required';
     if (!data.phone.match(/^\+?\d{10,15}$/)) newErrors.phone = 'Valid phone number is required';
     return newErrors;
-  };
+  }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     if (touched[name as keyof ClientDetails]) {
       setErrors(validate({ ...formData, [name]: value }));
     }
-  };
+  }, [formData, touched, validate]);
 
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+  const handleBlur = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
     const { name } = e.target;
     setTouched((prev) => ({ ...prev, [name]: true }));
     setErrors(validate(formData));
-  };
+  }, [formData, validate]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();
     const validationErrors = validate(formData);
     setErrors(validationErrors);
@@ -61,12 +74,12 @@ const RegisterForm = ({ onProceed, onRegister }: { onProceed: () => void; onRegi
       onRegister(formData);
       onProceed();
     }
-  };
+  }, [formData, validate, onRegister, onProceed]);
 
   return (
     <div className="bg-white shadow-2xl rounded-lg p-8 max-w-md w-full animate-slide-up">
       <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">Start Your Adventure</h2>
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6" noValidate>
         {(['name', 'email', 'phone'] as const).map((field) => (
           <div key={field} className="relative">
             <input
@@ -80,6 +93,7 @@ const RegisterForm = ({ onProceed, onRegister }: { onProceed: () => void; onRegi
               }`}
               placeholder=" "
               aria-describedby={`${field}-error`}
+              required
             />
             <label
               className={`absolute left-3 -top-2.5 text-sm text-gray-600 transition-all duration-300 peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-teal-500 ${
@@ -108,19 +122,29 @@ const RegisterForm = ({ onProceed, onRegister }: { onProceed: () => void; onRegi
 };
 
 const TourSlideshow = () => {
-  const languageContext = useContext(LanguageContext);
-  const language = languageContext?.language || 'en'; // Provide a default value like 'en'
+  const context = useContext(LanguageContext);
+  const language = context?.language || 'en';
   const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
+    if (!tours.length) return;
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % tours.length);
     }, 5000);
     return () => clearInterval(interval);
   }, []);
 
-  const handlePrev = () => setCurrentSlide((prev) => (prev - 1 + tours.length) % tours.length);
-  const handleNext = () => setCurrentSlide((prev) => (prev + 1) % tours.length);
+  const handlePrev = useCallback(() => {
+    setCurrentSlide((prev) => (prev - 1 + tours.length) % tours.length);
+  }, []);
+
+  const handleNext = useCallback(() => {
+    setCurrentSlide((prev) => (prev + 1) % tours.length);
+  }, []);
+
+  if (!tours.length) {
+    return <div className="text-center text-gray-600">No tours available.</div>;
+  }
 
   return (
     <div className="relative w-full max-w-4xl mx-auto mb-12">
@@ -133,11 +157,11 @@ const TourSlideshow = () => {
             <div
               key={tour.id}
               className="min-w-full h-96 bg-cover bg-center relative"
-              style={{ backgroundImage: `url(${tour.images[0] || '/people.jpg'})` }}
+              style={{ backgroundImage: `url(${tour.images[0] || tour.image || '/people.jpg'})` }}
             >
               <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-end p-6">
-                <h3 className="text-2xl font-bold text-white">{tour.title[language]}</h3>
-                <p className="text-white">{tour.description[language].slice(0, 100)}...</p>
+                <h3 className="text-2xl font-bold text-white">{tour.title[language as Language]}</h3>
+                <p className="text-white">{tour.description[language as Language].slice(0, 100)}...</p>
               </div>
             </div>
           ))}
@@ -162,41 +186,46 @@ const TourSlideshow = () => {
 };
 
 const Testimonials = () => {
-  const languageContext = useContext(LanguageContext);
-  const language = languageContext?.language || 'en'; // Provide a default value like 'en'
-  const testimonials = [
-    {
-      name: 'Sarah M.',
-      text: {
-        en: 'An unforgettable experience! The tour was well-organized, and the guides were amazing.',
-        fr: 'Une expérience inoubliable ! Le circuit était bien organisé et les guides étaient incroyables.',
-        rw: 'Ibyiza by’ukuri! Urugendo rwateguwe neza kandi abayobozi bari abahanga.',
+  const context = useContext(LanguageContext);
+  const language = context?.language || 'en';
+  const testimonials = useMemo(
+    () => [
+      {
+        name: 'Sarah M.',
+        text: {
+          en: 'An unforgettable experience! The tour was well-organized, and the guides were amazing.',
+          fr: 'Une expérience inoubliable ! Le circuit était bien organisé et les guides étaient incroyables.',
+          rw: 'Ibyiza by’ukuri! Urugendo rwateguwe neza kandi abayobozi bari abahanga.',
+        },
+        rating: 5,
       },
-      rating: 5,
-    },
-    {
-      name: 'James T.',
-      text: {
-        en: 'Loved the adventure and the breathtaking views. Highly recommend!',
-        fr: 'J’ai aimé l’aventure et les vues à couper le souffle. Je recommande vivement !',
-        rw: 'Nishimiye urugendo no kubona ibyiza by’umwuka. Ndasaba cyane!',
+      {
+        name: 'James T.',
+        text: {
+          en: 'Loved the adventure and the breathtaking views. Highly recommend!',
+          fr: 'J’ai aimé l’aventure et les vues à couper le souffle. Je recommande vivement !',
+          rw: 'Nishimiye urugendo no kubona ibyiza by’umwuka. Ndasaba cyane!',
+        },
+        rating: 4,
       },
-      rating: 4,
-    },
-    {
-      name: 'Emma L.',
-      text: {
-        en: 'Fantastic service and a seamless booking process. Will book again!',
-        fr: 'Service fantastique et processus de réservation fluide. Je réserverai à nouveau !',
-        rw: 'Serivisi nziza cyane no kugira ibyifuzo byoroshye. Nzongera kwiyandikisha!',
+      {
+        name: 'Emma L.',
+        text: {
+          en: 'Fantastic service and a seamless booking process. Will book again!',
+          fr: 'Service fantastique et processus de réservation fluide. Je réserverai à nouveau !',
+          rw: 'Serivisi nziza cyane no kugira ibyifuzo byoroshye. Nzongera kwiyandikisha!',
+        },
+        rating: 5,
       },
-      rating: 5,
-    },
-  ];
+    ],
+    []
+  );
 
   return (
     <div className="max-w-4xl mx-auto mb-12">
-      <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center animate-slide-up">What Our Customers Say</h2>
+      <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center animate-slide-up">
+        What Our Customers Say
+      </h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {testimonials.map((testimonial, index) => (
           <div
@@ -204,7 +233,7 @@ const Testimonials = () => {
             className="bg-white shadow-lg rounded-lg p-6 animate-slide-up"
             style={{ animationDelay: `${index * 0.1}s` }}
           >
-            <p className="text-gray-600 italic">"{testimonial.text[language]}"</p>
+            <p className="text-gray-600 italic">"{testimonial.text[language as Language]}"</p>
             <p className="mt-4 font-semibold text-gray-800">{testimonial.name}</p>
             <div className="flex mt-2">
               {[...Array(testimonial.rating)].map((_, i) => (
@@ -229,7 +258,8 @@ const TourCard = ({
   onSelect: (id: number) => void;
   clientDetails: ClientDetails | null;
 }) => {
-  const { language } = useContext(LanguageContext);
+  const context = useContext(LanguageContext);
+  const language = context?.language || 'en';
   const [isExpanded, setIsExpanded] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(Math.floor(Math.random() * 100));
@@ -244,21 +274,24 @@ const TourCard = ({
   const [isSending, setIsSending] = useState(false);
 
   useEffect(() => {
+    if (!tour.images?.length) return;
     const interval = setInterval(() => {
       setCurrentImageIndex((prev) => (prev + 1) % tour.images.length);
     }, 3000);
     return () => clearInterval(interval);
-  }, [tour.images.length]);
+  }, [tour.images]);
 
-  const handleLike = () => {
-    setIsLiked(!isLiked);
+  const handleLike = useCallback(() => {
+    setIsLiked((prev) => !prev);
     setLikeCount((prev) => (isLiked ? prev - 1 : prev + 1));
-  };
+  }, [isLiked]);
 
-  const handleShare = async () => {
+  const handleShare = useCallback(async () => {
     const shareData = {
-      title: tour.title[language],
-      text: `Check out this amazing tour: ${tour.title[language]}! ${tour.description[language].slice(0, 100)}...`,
+      title: tour.title[language as Language],
+      text: `Check out this amazing tour: ${tour.title[language as Language]}! ${tour.description[
+        language as Language
+      ].slice(0, 100)}...`,
       url: `https://kivu-safaris.com/tours/${tour.id}`,
     };
     if (navigator.share) {
@@ -268,59 +301,60 @@ const TourCard = ({
         console.error('Share failed:', error);
       }
     } else {
+      const encodedText = encodeURIComponent(shareData.text);
+      const encodedUrl = encodeURIComponent(shareData.url);
       alert(
-        `Share this tour:\nTwitter: https://twitter.com/intent/tweet?text=${encodeURIComponent(
-          shareData.text
-        )}&url=${encodeURIComponent(
-          shareData.url
-        )}\nFacebook: https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareData.url)}`
+        `Share this tour:\nTwitter: https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}\nFacebook: https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`
       );
     }
-  };
+  }, [tour, language]);
 
-  const handleInviteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInviteChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setInviteFormData((prev) => ({ ...prev, [name]: value }));
     if (inviteError) setInviteError('');
-  };
+  }, [inviteError]);
 
-  const handleInvite = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setInviteError('');
-    setInviteSuccess('');
-    const { senderName, recipientEmail } = inviteFormData;
+  const handleInvite = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      setInviteError('');
+      setInviteSuccess('');
+      const { senderName, recipientEmail } = inviteFormData;
 
-    if (!senderName.trim()) {
-      setInviteError('Please enter your name');
-      return;
-    }
-    if (!recipientEmail.match(/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/)) {
-      setInviteError('Please enter a valid email address');
-      return;
-    }
+      if (!senderName.trim()) {
+        setInviteError('Please enter your name');
+        return;
+      }
+      if (!recipientEmail.match(/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/)) {
+        setInviteError('Please enter a valid email address');
+        return;
+      }
 
-    setIsSending(true);
-    try {
-      const response = await sendEmailInvitation({ senderName, recipientEmail, tour });
-      setInviteSuccess(response.message);
-      setInviteFormData({ senderName: clientDetails?.name || '', recipientEmail: '' });
-      setTimeout(() => {
-        setShowInviteForm(false);
-        setInviteSuccess('');
-      }, 3000);
-    } catch (error) {
-      setInviteError('Failed to send invitation. Please try again.');
-    } finally {
-      setIsSending(false);
-    }
-  };
+      setIsSending(true);
+      try {
+        const response = await sendEmailInvitation({ senderName, recipientEmail, tour });
+        setInviteSuccess(response.message);
+        setInviteFormData({ senderName: clientDetails?.name || '', recipientEmail: '' });
+        setTimeout(() => {
+          setShowInviteForm(false);
+          setInviteSuccess('');
+        }, 3000);
+      } catch (error) {
+        setInviteError(error instanceof Error ? error.message : 'Failed to send invitation');
+      } finally {
+        setIsSending(false);
+      }
+    },
+    [inviteFormData, tour, clientDetails]
+  );
 
   return (
     <div className="bg-white shadow-lg rounded-lg p-6 hover:shadow-xl transition-shadow duration-300 animate-slide-up">
       <div className="relative w-full h-48 mb-4">
         <img
-          src={tour.images[currentImageIndex] || 'https://via.placeholder.com/300x200'}
-          alt={tour.title[language]}
+          src={tour.images[currentImageIndex] || tour.image || 'https://via.placeholder.com/300x200'}
+          alt={tour.title[language as Language]}
           className="w-full h-full object-cover rounded-lg transition-opacity duration-500"
         />
         <div className="absolute top-2 right-2 flex space-x-2">
@@ -360,16 +394,16 @@ const TourCard = ({
           </button>
         </div>
       </div>
-  <h3 className="text-xl font-semibold text-gray-800">{tour.title[language as keyof typeof tour.title]}</h3>
-  <p className="text-gray-600 mt-2 line-clamp-3">{tour.description[language as keyof typeof tour.description]}</p>
-  <p className="text-teal-600 font-bold mt-2">${tour.price} USD</p>
-  <p className="text-gray-600 mt-1">Duration: {tour.duration}</p>
-  <p className="text-gray-600 mt-1">Location: {tour.location}</p>
+      <h3 className="text-xl font-semibold text-gray-800">{tour.title[language as Language]}</h3>
+      <p className="text-gray-600 mt-2 line-clamp-3">{tour.description[language as Language]}</p>
+      <p className="text-teal-600 font-bold mt-2">${tour.price} {tour.currency}</p>
+      <p className="text-gray-600 mt-1">Duration: {tour.duration}</p>
+      <p className="text-gray-600 mt-1">Location: {tour.location}</p>
       <div className="flex space-x-2 mt-4">
         <button
           onClick={() => onSelect(tour.id)}
           className="flex-1 bg-teal-600 text-white p-2 rounded-lg hover:bg-teal-700 transition-colors transform hover:scale-105 duration-200"
-          aria-label={`Book ${tour.title[language]}`}
+          aria-label={`Book ${tour.title[language as Language]}`}
         >
           Book Now
         </button>
@@ -383,7 +417,7 @@ const TourCard = ({
         <button
           onClick={() => setShowInviteForm(true)}
           className="flex-1 bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition-colors transform hover:scale-105 duration-200"
-          aria-label={`Invite a friend to ${tour.title[language]}`}
+          aria-label={`Invite a friend to ${tour.title[language as Language]}`}
         >
           Invite a Friend
         </button>
@@ -394,6 +428,7 @@ const TourCard = ({
             className="bg-white rounded-lg p-8 max-w-md w-full animate-slide-up-bounce shadow-2xl"
             role="dialog"
             aria-labelledby="invite-form-title"
+            aria-modal="true"
           >
             <button
               onClick={() => setShowInviteForm(false)}
@@ -405,9 +440,9 @@ const TourCard = ({
               </svg>
             </button>
             <h3 id="invite-form-title" className="text-2xl font-bold text-gray-800 mb-6">
-              Invite a Friend to {tour.title[language]}
+              Invite a Friend to {tour.title[language as Language]}
             </h3>
-            <form onSubmit={handleInvite} className="space-y-6">
+            <form onSubmit={handleInvite} className="space-y-6" noValidate>
               <div className="relative">
                 <input
                   type="text"
@@ -420,6 +455,7 @@ const TourCard = ({
                   placeholder=" "
                   disabled={!!clientDetails?.name}
                   aria-describedby="senderName-error"
+                  required
                 />
                 <label
                   className={`absolute left-3 -top-2.5 text-sm text-gray-600 transition-all duration-300 peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-blue-500 ${
@@ -447,6 +483,7 @@ const TourCard = ({
                   }`}
                   placeholder=" "
                   aria-describedby="recipientEmail-error"
+                  required
                 />
                 <label
                   className={`absolute left-3 -top-2.5 text-sm text-gray-600 transition-all duration-300 peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-blue-500 ${
@@ -499,24 +536,24 @@ const TourCard = ({
           <div>
             <h4 className="text-lg font-semibold text-gray-800">Highlights</h4>
             <ul className="list-disc pl-5 text-gray-600">
-              {(tour.highlights || []).map((highlight, index) => (
+              {tour.highlights.map((highlight, index) => (
                 <li key={index}>{highlight}</li>
               ))}
             </ul>
           </div>
           <div>
             <h4 className="text-lg font-semibold text-gray-800">Itinerary</h4>
-            {(tour.itinerary || []).map((item) => (
+            {tour.itinerary.map((item) => (
               <div key={item.day} className="mt-2">
                 <p className="font-medium text-gray-800">Day {item.day}</p>
-                <p className="text-gray-600">{item.description[language]}</p>
+                <p className="text-gray-600">{item.description[language as Language]}</p>
               </div>
             ))}
           </div>
           <div>
             <h4 className="text-lg font-semibold text-gray-800">Not Included</h4>
             <ul className="list-disc pl-5 text-gray-600">
-              {(tour.notIncluded || []).map((item, index) => (
+              {tour.notIncluded.map((item, index) => (
                 <li key={index}>{item}</li>
               ))}
             </ul>
@@ -530,7 +567,7 @@ const TourCard = ({
 interface BookingFormData {
   tourDate: string;
   participants: number;
-  paymentMethod: string;
+  paymentMethod: Booking['paymentMethod'];
   depositPaid: boolean;
   specialRequests: string;
 }
@@ -544,50 +581,66 @@ const BookingForm = ({
   onSubmit: (data: BookingFormData) => void;
   initialData?: Partial<Booking>;
 }) => {
-  const { language } = useContext(LanguageContext);
+  const context = useContext(LanguageContext);
+  const language = context?.language || 'en';
   const [formData, setFormData] = useState<BookingFormData>({
     tourDate: initialData?.tourDate || '',
-    participants: initialData?.participants || 1,
+    participants: initialData?.participants || tour.minParticipants,
     paymentMethod: initialData?.paymentMethod || 'credit_card',
     depositPaid: initialData?.depositPaid || false,
     specialRequests: initialData?.specialRequests || '',
   });
   const [errors, setErrors] = useState<Partial<BookingFormData>>({});
 
-  const validate = (data: BookingFormData): Partial<BookingFormData> => {
-    const newErrors: Partial<BookingFormData> = {};
-    const today = new Date().toISOString().split('T')[0];
-    if (!data.tourDate || data.tourDate < today) newErrors.tourDate = 'Please select a future date';
-    if (data.participants < tour.minParticipants) newErrors.participants = `At least ${tour.minParticipants} participants are required`;
-    if (data.participants > tour.maxParticipants) newErrors.participants = `Maximum ${tour.maxParticipants} participants allowed`;
-    return newErrors;
-  };
+  const validate = useCallback(
+    (data: BookingFormData): Partial<BookingFormData> => {
+      const newErrors: Partial<BookingFormData> = {};
+      const today = new Date().toISOString().split('T')[0];
+      if (!data.tourDate || data.tourDate < today) newErrors.tourDate = 'Please select a future date';
+      if (data.participants < tour.minParticipants)
+        newErrors.participants = `At least ${tour.minParticipants} participants are required`;
+      if (data.participants > tour.maxParticipants)
+        newErrors.participants = `Maximum ${tour.maxParticipants} participants allowed`;
+      if (!data.paymentMethod) newErrors.paymentMethod = 'Please select a payment method';
+      return newErrors;
+    },
+    [tour.minParticipants, tour.maxParticipants]
+  );
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value, type } = e.target;
-    const checked = (e.target as HTMLInputElement).checked;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : type === 'number' ? Number(value) : value,
-    }));
-    setErrors(validate({ ...formData, [name]: type === 'checkbox' ? checked : type === 'number' ? Number(value) : value }));
-  };
+  const handleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+      const { name, value, type } = e.target;
+      const checked = (e.target as HTMLInputElement).checked;
+      setFormData((prev) => ({
+        ...prev,
+        [name]: type === 'checkbox' ? checked : type === 'number' ? Number(value) : value,
+      }));
+      setErrors(
+        validate({
+          ...formData,
+          [name]: type === 'checkbox' ? checked : type === 'number' ? Number(value) : value,
+        })
+      );
+    },
+    [formData, validate]
+  );
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const validationErrors = validate(formData);
-    setErrors(validationErrors);
-    if (Object.keys(validationErrors).length === 0) {
-      onSubmit(formData);
-    }
-  };
+  const handleSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      const validationErrors = validate(formData);
+      setErrors(validationErrors);
+      if (Object.keys(validationErrors).length === 0) {
+        onSubmit(formData);
+      }
+    },
+    [formData, validate, onSubmit]
+  );
 
   return (
     <div className="bg-white shadow-lg rounded-lg p-6 animate-slide-up">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">Book {tour.title[language as keyof typeof tour.title]}</h2>
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <h2 className="text-2xl font-bold text-gray-800 mb-6">Book {tour.title[language as Language]}</h2>
+      <form onSubmit={handleSubmit} className="space-y-6" noValidate>
         <div className="relative">
           <select
             name="tourDate"
@@ -599,10 +652,18 @@ const BookingForm = ({
             }`}
             aria-describedby="tourDate-error"
           >
-            <option value="" disabled>Select a date</option>
-          {(tour.availableDates || []).map((date) => (
-            <option key={date} value={date}>{new Date(date).toLocaleDateString()}</option>
-          ))}
+            <option value="" disabled>
+              Select a date
+            </option>
+            {tour.availableDates.length ? (
+              tour.availableDates.map((date) => (
+                <option key={date} value={date}>
+                  {new Date(date).toLocaleDateString()}
+                </option>
+              ))
+            ) : (
+              <option disabled>No available dates</option>
+            )}
           </select>
           <label
             className={`absolute left-3 -top-2.5 text-sm text-gray-600 transition-all duration-300 peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-teal-500 ${
@@ -650,19 +711,33 @@ const BookingForm = ({
             name="paymentMethod"
             value={formData.paymentMethod}
             onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
-            aria-label="Payment method"
+            required
+            className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 peer ${
+              errors.paymentMethod ? 'border-red-500' : 'border-gray-300'
+            }`}
+            aria-describedby="paymentMethod-error"
           >
+            <option value="" disabled>
+              Select a payment method
+            </option>
             <option value="credit_card">Credit Card</option>
             <option value="paypal">PayPal</option>
             <option value="bank_transfer">Bank Transfer</option>
             <option value="mobile_money">Mobile Money</option>
+            <option value="cash">Cash</option>
           </select>
           <label
-            className="absolute left-3 -top-2.5 text-sm text-gray-600 transition-all duration-300"
+            className={`absolute left-3 -top-2.5 text-sm text-gray-600 transition-all duration-300 peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-teal-500 ${
+              errors.paymentMethod ? 'text-red-500' : ''
+            }`}
           >
             Payment Method
           </label>
+          {errors.paymentMethod && (
+            <p id="paymentMethod-error" className="text-red-500 text-sm mt-1">
+              {errors.paymentMethod}
+            </p>
+          )}
         </div>
         <div>
           <label className="flex items-center space-x-2">
@@ -712,7 +787,11 @@ const ErrorToast = ({ message, onClose }: { message: string; onClose: () => void
   }, [onClose]);
 
   return (
-    <div className="fixed bottom-4 right-4 bg-red-500 text-white p-4 rounded-lg shadow-lg animate-slide-up">
+    <div
+      className="fixed bottom-4 right-4 bg-red-500 text-white p-4 rounded-lg shadow-lg animate-slide-up"
+      role="alert"
+      aria-live="assertive"
+    >
       <p>{message}</p>
       <button
         onClick={onClose}
@@ -730,7 +809,7 @@ const BookingEntry = () => {
   if (!context) {
     throw new Error('LanguageContext is undefined, make sure you are using LanguageProvider');
   }
-  const language = context.language;
+  const language = context.language as Language;
   const [step, setStep] = useState<'register' | 'select-tour' | 'book' | 'confirmed'>('register');
   const [selectedTourId, setSelectedTourId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -739,27 +818,33 @@ const BookingEntry = () => {
   const [clientDetails, setClientDetails] = useState<ClientDetails | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const handleRegistrationProceed = () => {
+  const handleRegistrationProceed = useCallback(() => {
     setStep('select-tour');
-  };
+  }, []);
 
-  const handleRegister = (data: ClientDetails) => {
+  const handleRegister = useCallback((data: ClientDetails) => {
     setClientDetails(data);
-  };
+  }, []);
 
-  const handleTourSelect = (tourId: number) => {
+  const handleTourSelect = useCallback((tourId: number) => {
     setSelectedTourId(tourId);
     setStep('book');
-  };
+  }, []);
 
-  const handleBookingSubmit = async (data: BookingFormData) => {
-    if (!selectedTourId || !clientDetails) return;
-    setIsLoading(true);
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+  const handleBookingSubmit = useCallback(
+    async (data: BookingFormData) => {
+      if (!selectedTourId || !clientDetails) {
+        setError('Missing required information');
+        return;
+      }
+      setIsLoading(true);
+      try {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      const tour = tours.find((t) => t.id === selectedTourId);
-      if (!tour) throw new Error('Tour not found');
+        const tour = tours.find((t) => t.id === selectedTourId);
+        if (!tour) {
+          throw new Error('Tour not found');
+        }
 
         const booking: Booking = {
           id: Math.floor(Math.random() * 1000000).toString(),
@@ -769,8 +854,8 @@ const BookingEntry = () => {
           participants: data.participants,
           status: 'confirmed',
           tourDetails: {
-            title: tour.title,
-            image: tour.image,
+            title: tour.title, // Use object form
+            image: tour.image || tour.images[0],
           },
           clientDetails,
           specialRequests: data.specialRequests || undefined,
@@ -778,7 +863,7 @@ const BookingEntry = () => {
           depositPaid: data.depositPaid,
           depositAmount: data.depositPaid ? tour.price * data.participants * 0.1 : undefined,
           paymentStatus: data.depositPaid ? 'partial' : 'unpaid',
-          paymentMethod: data.paymentMethod as 'credit_card' | 'bank_transfer' | 'mobile_money',
+          paymentMethod: data.paymentMethod,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
           bookingDate: new Date().toISOString(),
@@ -789,82 +874,95 @@ const BookingEntry = () => {
           },
         };
 
-      setBookingDetails(booking);
+        setBookingDetails(booking);
 
-      const receipt: Receipt = {
-        id: `rec_${booking.id}`,
-        bookingId: booking.id,
-        uniqueId: `${booking.userId}-${new Date(booking.createdAt).getTime()}-${new Date(
-          booking.createdAt
-        ).toLocaleString('en-US', { weekday: 'short' })}`,
-        clientDetails,
-        tourDetails: {
-          title: tour.title,
-          date: booking.tourDate,
-          participants: booking.participants,
-          price: booking.totalPrice,
-          image: tour.image,
-          specialRequests: booking.specialRequests,
-        },
-        paymentDetails: {
-          total: booking.totalPrice,
-          deposit: booking.depositPaid ? booking.totalPrice * 0.1 : 0,
-          balance: booking.depositPaid ? booking.totalPrice * 0.9 : booking.totalPrice,
-          currency: tour.currency,
-          method: booking.paymentMethod as 'credit_card' | 'bank_transfer' | 'mobile_money',
-          transactionId: `TXN-${Math.random().toString(36).substring(2, 8)}`,
-          paidAt: booking.createdAt,
-        },
-        createdAt: booking.createdAt,
-        updatedAt: booking.createdAt,
-      };
+        const receipt: ExtendedReceipt = {
+          id: `rec_${booking.id}`,
+          bookingId: booking.id,
+          uniqueId: `${booking.userId}-${new Date(booking.createdAt).getTime()}-${new Date(
+            booking.createdAt
+          ).toLocaleString('en-US', { weekday: 'short' })}`,
+          clientDetails,
+          tourDetails: {
+            title: tour.title,
+            date: booking.tourDate,
+            participants: booking.participants,
+            price: booking.totalPrice,
+            image: tour.image || tour.images[0],
+            specialRequests: booking.specialRequests,
+          },
+          paymentDetails: {
+            total: booking.totalPrice,
+            deposit: booking.depositPaid ? booking.totalPrice * 0.1 : 0,
+            balance: booking.depositPaid ? booking.totalPrice * 0.9 : booking.totalPrice,
+            currency: tour.currency,
+            method: booking.paymentMethod || 'credit_card',
+            transactionId: `TXN-${Math.random().toString(36).substring(2, 8)}`,
+            paidAt: booking.createdAt,
+          },
+          createdAt: booking.createdAt,
+          updatedAt: booking.createdAt,
+        };
 
-      const receiptBlob = await generateReceipt(receipt);
-      const url = URL.createObjectURL(receiptBlob);
-      setReceiptUrl(url);
-      setStep('confirmed');
-    } catch (error) {
-      console.error('Booking failed:', error);
-      setError('Failed to process booking. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+        const receiptBlob = await generateReceipt(receipt);
+        if (!receiptBlob) {
+          throw new Error('Failed to generate receipt');
+        }
+        const url = URL.createObjectURL(receiptBlob);
+        setReceiptUrl(url);
+        setStep('confirmed');
+      } catch (error) {
+        console.error('Booking failed:', error);
+        setError(error instanceof Error ? error.message : 'Failed to process booking');
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [selectedTourId, clientDetails]
+  );
 
-  const handleBookingUpdate = async (data: BookingFormData) => {
-    if (!bookingDetails || !selectedTourId || !clientDetails) return;
-    setIsLoading(true);
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+  const handleBookingUpdate = useCallback(
+    async (data: BookingFormData) => {
+      if (!bookingDetails || !selectedTourId || !clientDetails) {
+        setError('Missing required information');
+        return;
+      }
+      setIsLoading(true);
+      try {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      const tour = tours.find((t) => t.id === Number(bookingDetails.tourId));
-      if (!tour) throw new Error('Tour not found');
+        const tour = tours.find((t) => t.id === selectedTourId);
+        if (!tour) {
+          throw new Error('Tour not found');
+        }
 
-      const updatedBooking: Booking = {
-        ...bookingDetails,
-        tourDate: data.tourDate,
-        participants: data.participants,
-        totalPrice: tour.price * data.participants,
-        paymentMethod: data.paymentMethod as 'credit_card' | 'bank_transfer' | 'mobile_money',
-        depositPaid: data.depositPaid,
-        depositAmount: data.depositPaid ? tour.price * data.participants * 0.1 : undefined,
-        specialRequests: data.specialRequests || undefined,
-        tourDetails: {
-          title: tour.title,
-          image: tour.image,
-        },
-        updatedAt: new Date().toISOString(),
-      };
+        const updatedBooking: Booking = {
+          ...bookingDetails,
+          tourDate: data.tourDate,
+          participants: data.participants,
+          totalPrice: tour.price * data.participants,
+          paymentMethod: data.paymentMethod,
+          depositPaid: data.depositPaid,
+          depositAmount: data.depositPaid ? tour.price * data.participants * 0.1 : undefined,
+          specialRequests: data.specialRequests || undefined,
+          tourDetails: {
+            title: tour.title,
+            image: tour.image || tour.images[0],
+          },
+          updatedAt: new Date().toISOString(),
+        };
 
-      setBookingDetails(updatedBooking);
-      setStep('confirmed');
-    } catch (error) {
-      console.error('Failed to update booking:', error);
-      setError('Failed to update booking. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+        setBookingDetails(updatedBooking);
+        setStep('confirmed');
+      } catch (error) {
+        console.error('Failed to update booking:', error);
+        setError(error instanceof Error ? error.message : 'Failed to update booking');
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [bookingDetails, selectedTourId, clientDetails]
+  );
 
   if (isLoading) {
     return <LoadingState message="Processing your request..." />;
@@ -911,11 +1009,7 @@ const BookingEntry = () => {
                 className="animate-slide-up"
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
-                <TourCard
-                  tour={tour}
-                  onSelect={handleTourSelect}
-                  clientDetails={clientDetails}
-                />
+                <TourCard tour={tour} onSelect={handleTourSelect} clientDetails={clientDetails} />
               </div>
             ))}
           </div>
@@ -930,7 +1024,9 @@ const BookingEntry = () => {
     if (!tour) {
       return (
         <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-          <p className="text-red-600">Error: Selected tour not found.</p>
+          <p className="text-red-600" role="alert">
+            Error: Selected tour not found.
+          </p>
         </div>
       );
     }
@@ -940,7 +1036,7 @@ const BookingEntry = () => {
           <BookingForm
             tour={tour}
             onSubmit={bookingDetails ? handleBookingUpdate : handleBookingSubmit}
-            initialData={bookingDetails || undefined}
+            initialData={bookingDetails}
           />
         </div>
         {error && <ErrorToast message={error} onClose={() => setError(null)} />}
@@ -959,7 +1055,7 @@ const BookingEntry = () => {
           </p>
           <div className="text-left space-y-2 mb-6">
             <p>
-              <strong>Tour:</strong> {tour?.title[language as keyof typeof tour.title] || 'Unknown Tour'}
+              <strong>Tour:</strong> {tour?.title[language as Language] || 'Unknown Tour'}
             </p>
             <p>
               <strong>Date:</strong> {bookingDetails.tourDate}
@@ -972,7 +1068,7 @@ const BookingEntry = () => {
             </p>
             <p>
               <strong>Payment Method:</strong>{' '}
-              {bookingDetails.paymentMethod.replace('_', ' ').toUpperCase()}
+              {bookingDetails.paymentMethod?.replace('_', ' ').toUpperCase() || 'N/A'}
             </p>
             <p>
               <strong>Deposit Paid:</strong> {bookingDetails.depositPaid ? 'Yes' : 'No'}
@@ -1023,7 +1119,9 @@ const BookingEntry = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-      <p className="text-red-600">Error: Invalid state. Please try again.</p>
+      <p className="text-red-600" role="alert">
+        Error: Invalid state. Please try again.
+      </p>
       {error && <ErrorToast message={error} onClose={() => setError(null)} />}
     </div>
   );
