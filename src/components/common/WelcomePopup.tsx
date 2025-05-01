@@ -73,6 +73,11 @@ const WelcomePopup: React.FC = () => {
     }
   }, [dismissPermanently]);
 
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+    if (emailError) setEmailError('');
+  };
+
   const handleSubscribe = useCallback(() => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
@@ -135,7 +140,7 @@ const WelcomePopup: React.FC = () => {
         {/* Slideshow */}
         <div className="relative h-48 sm:h-64 md:h-80 my-3 sm:my-4 rounded-lg overflow-hidden">
           <Slideshow
-            images={images.map((image) => image.src)}
+            images={images}
             interval={4000}
             autoplay={!isPaused}
             showDots={true}
@@ -188,7 +193,7 @@ const WelcomePopup: React.FC = () => {
                   <input
                     type="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={handleEmailChange}
                     placeholder="Enter your email"
                     className="w-full p-1.5 sm:p-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-teal-300"
                     aria-label="Email for newsletter"

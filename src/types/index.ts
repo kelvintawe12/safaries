@@ -18,20 +18,24 @@ export interface Tour {
   duration: string;
   category: string;
   difficulty: string;
-  featured: boolean;
   tags: string[];
-  promocode?: string;
-  reviews: any[]; // Adjust type if review structure is known
+  reviews: any[];
   rating: number;
   minParticipants: number;
+  maxParticipants: number;
   location: string;
   highlights: string[];
   availableDates: string[];
-  maxParticipants: number;
   included: string[];
   notIncluded: string[];
+  promocode?: string;
   itinerary: {
     day: number;
+    title?: {
+      en: string;
+      fr: string;
+      rw: string;
+    };
     description: {
       en: string;
       fr: string;
@@ -40,6 +44,7 @@ export interface Tour {
   }[];
   createdAt: string;
   updatedAt: string;
+  featured: boolean;
 }
 
 export const tours: Tour[] = [
@@ -69,7 +74,6 @@ export const tours: Tour[] = [
     difficulty: "Easy",
     featured: true,
     tags: ["lake", "culture", "relaxation"],
-    promocode: "KIVU2025",
     reviews: [],
     rating: 4.8,
     minParticipants: 2,
@@ -98,6 +102,11 @@ export const tours: Tour[] = [
     itinerary: [
       {
         day: 1,
+        title: {
+          en: "Arrival and Welcome Dinner",
+          fr: "Arrivée et dîner de bienvenue",
+          rw: "Kugera no gufungura by'ikaze",
+        },
         description: {
           en: "Arrive in Goma, transfer to your lakeside accommodation. Enjoy a welcome dinner with cultural performances.",
           fr: "Arrivez à Goma, transfert vers votre hébergement au bord du lac. Profitez d'un dîner de bienvenue avec des spectacles culturels.",
@@ -150,7 +159,6 @@ export const tours: Tour[] = [
     difficulty: "Moderate",
     featured: true,
     tags: ["volcano", "trekking", "adventure"],
-    promocode: undefined,
     reviews: [],
     rating: 4.9,
     minParticipants: 4,
@@ -197,4 +205,167 @@ export const tours: Tour[] = [
     createdAt: "2023-01-01T00:00:00Z",
     updatedAt: "2023-01-01T00:00:00Z",
   },
+  {
+    id: 3,
+    title: {
+      en: "New Tour Title",
+      fr: "Titre du Nouveau Tour",
+      rw: "Izina rishya ry'urugendo",
+    },
+    description: {
+      en: "Description in English.",
+      fr: "Description en français.",
+      rw: "Ibisobanuro mu Kinyarwanda.",
+    },
+    price: 500,
+    currency: "USD",
+    image: "https://example.com/image.jpg",
+    images: ["https://example.com/image1.jpg", "https://example.com/image2.jpg"],
+    durationDays: 4,
+    duration: "4 days, 3 nights",
+    category: "Adventure",
+    difficulty: "Moderate",
+    tags: ["adventure", "culture"],
+    reviews: [],
+    rating: 4.5,
+    minParticipants: 2,
+    maxParticipants: 10,
+    location: "New Location",
+    highlights: ["Highlight 1", "Highlight 2"],
+    availableDates: ["2025-09-01", "2025-10-01"],
+    included: ["Item 1", "Item 2"],
+    notIncluded: ["Item 3", "Item 4"],
+    itinerary: [
+      {
+        day: 1,
+        description: {
+          en: "Day 1 description in English.",
+          fr: "Jour 1 description en français.",
+          rw: "Umunsi wa 1 ibisobanuro mu Kinyarwanda.",
+        },
+      },
+    ],
+    createdAt: "2023-01-01T00:00:00Z",
+    updatedAt: "2023-01-01T00:00:00Z",
+    featured: false,
+  },
 ];
+
+export interface PrivacySection {
+  id: number;
+  title: {
+    en: string;
+    fr: string;
+    rw: string;
+  };
+  content: {
+    en: string;
+    fr: string;
+    rw: string;
+  };
+}
+
+export interface Testimonial {
+  id: number;
+  name: string;
+  location: string;
+  rating: number; // Assuming rating is a number (e.g., 1-5)
+  comment: string;
+  image: string; // URL to the user's image
+  date: string; // ISO date string (e.g., "2023-06-15")
+}
+
+export interface FAQ {
+  id: number;
+  question: {
+    en: string;
+    fr: string;
+    rw: string;
+  };
+  answer: {
+    en: string;
+    fr: string;
+    rw: string;
+  };
+  category: string; // Example: "Planning", "Safety", etc.
+}
+
+export interface Booking {
+  id: string;
+  userId: string;
+  tourId: number;
+  tourTitle?: string;
+  tourDetails?: {
+    title: { en: string; fr: string; rw: string } | string;
+    date?: string;
+    participants?: number;
+    price?: number;
+    image?: string;
+    specialRequests?: string;
+  };
+  tourDate: string;
+  participants: number;
+  totalPrice: number;
+  paymentMethod?: 'credit_card' | 'bank_transfer' | 'mobile_money' | 'paypal' | 'cash';
+  depositPaid?: boolean;
+  depositAmount?: number;
+  paymentStatus?: 'unpaid' | 'partial' | 'paid';
+  status: 'confirmed' | 'pending' | 'cancelled';
+  clientDetails: {
+    name: string;
+    email: string;
+    phone: string;
+  };
+  specialRequests?: string;
+  createdAt: string;
+  updatedAt?: string;
+  bookingDate?: string;
+  confirmationCode?: string;
+  analytics?: {
+    source: string;
+    bookedVia: string;
+  };
+}
+
+export interface Receipt {
+  id: string;
+  bookingId: string;
+  uniqueId: string;
+  clientDetails: {
+    name: string;
+    email: string;
+    phone: string;
+  };
+  tourDetails: {
+    title: { en: string; fr: string; rw: string };
+    date: string;
+    participants: number;
+    price: number;
+    image?: string;
+  };
+  paymentDetails: {
+    total: number;
+    deposit: number;
+    balance: number;
+    currency: string;
+    method: string;
+    transactionId?: string;
+    paidAt: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TourDetails {
+  id: string;
+  title: { en: string; fr: string; rw: string };
+  description: { en: string; fr: string; rw: string };
+  price: number;
+  currency: string;
+  duration: string;
+  location: string;
+  highlights: string[];
+  images: string[];
+}
+
+

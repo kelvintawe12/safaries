@@ -5,7 +5,13 @@ import { tours } from '../data/tours';
 import { generateReceipt } from '../utils/receipt';
 import { LoadingState } from '../components/common/LoadingState';
 import { LanguageContext } from '../contexts/LanguageContext';
-import { Tour, Booking, Receipt, ClientDetails, TourDetails } from '../types';
+import { Tour, Booking, Receipt, TourDetails } from '../types';
+
+interface ClientDetails {
+  name: string;
+  email: string;
+  phone: string;
+}
 
 const sendEmailInvitation = async (data: {
   senderName: string;
@@ -354,11 +360,11 @@ const TourCard = ({
           </button>
         </div>
       </div>
-          <h3 className="text-xl font-semibold text-gray-800">{tour.title[language as keyof typeof tour.title]}</h3>
-      <p className="text-gray-600 mt-2 line-clamp-3">{tour.description[language]}</p>
-      <p className="text-teal-600 font-bold mt-2">${tour.price} USD</p>
-      <p className="text-gray-600 mt-1">Duration: {tour.duration}</p>
-      <p className="text-gray-600 mt-1">Location: {tour.location}</p>
+  <h3 className="text-xl font-semibold text-gray-800">{tour.title[language as keyof typeof tour.title]}</h3>
+  <p className="text-gray-600 mt-2 line-clamp-3">{tour.description[language as keyof typeof tour.description]}</p>
+  <p className="text-teal-600 font-bold mt-2">${tour.price} USD</p>
+  <p className="text-gray-600 mt-1">Duration: {tour.duration}</p>
+  <p className="text-gray-600 mt-1">Location: {tour.location}</p>
       <div className="flex space-x-2 mt-4">
         <button
           onClick={() => onSelect(tour.id)}
@@ -724,7 +730,7 @@ const BookingEntry = () => {
   if (!context) {
     throw new Error('LanguageContext is undefined, make sure you are using LanguageProvider');
   }
-  const { language } = context;
+  const language = context.language;
   const [step, setStep] = useState<'register' | 'select-tour' | 'book' | 'confirmed'>('register');
   const [selectedTourId, setSelectedTourId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -755,37 +761,33 @@ const BookingEntry = () => {
       const tour = tours.find((t) => t.id === selectedTourId);
       if (!tour) throw new Error('Tour not found');
 
-      const booking: Booking = {
-        id: Math.floor(Math.random() * 1000000).toString(),
-        userId: '1',
-        tourId: selectedTourId,
-        tourDate: data.tourDate,
-        participants: data.participants,
-        status: 'confirmed',
-        tourDetails: {
-          title: tour.title,
-          date: data.tourDate,
+        const booking: Booking = {
+          id: Math.floor(Math.random() * 1000000).toString(),
+          userId: '1',
+          tourId: selectedTourId,
+          tourDate: data.tourDate,
           participants: data.participants,
-          price: tour.price * data.participants,
-          image: tour.image,
+          status: 'confirmed',
+          tourDetails: {
+            title: tour.title,
+            image: tour.image,
+          },
+          clientDetails,
           specialRequests: data.specialRequests || undefined,
-        },
-        clientDetails,
-        specialRequests: data.specialRequests || undefined,
-        totalPrice: tour.price * data.participants,
-        depositPaid: data.depositPaid,
-        depositAmount: data.depositPaid ? tour.price * data.participants * 0.1 : undefined,
-        paymentStatus: data.depositPaid ? 'partial' : 'unpaid',
-        paymentMethod: data.paymentMethod as 'credit_card' | 'bank_transfer' | 'mobile_money',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        bookingDate: new Date().toISOString(),
-        confirmationCode: `KVS-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
-        analytics: {
-          source: 'website',
-          bookedVia: 'tours_page',
-        },
-      };
+          totalPrice: tour.price * data.participants,
+          depositPaid: data.depositPaid,
+          depositAmount: data.depositPaid ? tour.price * data.participants * 0.1 : undefined,
+          paymentStatus: data.depositPaid ? 'partial' : 'unpaid',
+          paymentMethod: data.paymentMethod as 'credit_card' | 'bank_transfer' | 'mobile_money',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          bookingDate: new Date().toISOString(),
+          confirmationCode: `KVS-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
+          analytics: {
+            source: 'website',
+            bookedVia: 'tours_page',
+          },
+        };
 
       setBookingDetails(booking);
 
@@ -835,7 +837,7 @@ const BookingEntry = () => {
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      const tour = tours.find((t) => t.id === bookingDetails.tourId);
+      const tour = tours.find((t) => t.id === Number(bookingDetails.tourId));
       if (!tour) throw new Error('Tour not found');
 
       const updatedBooking: Booking = {
@@ -849,11 +851,7 @@ const BookingEntry = () => {
         specialRequests: data.specialRequests || undefined,
         tourDetails: {
           title: tour.title,
-          date: data.tourDate,
-          participants: data.participants,
-          price: tour.price * data.participants,
           image: tour.image,
-          specialRequests: data.specialRequests || undefined,
         },
         updatedAt: new Date().toISOString(),
       };
