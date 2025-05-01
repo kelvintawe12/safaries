@@ -1,12 +1,12 @@
 // MyBookings.tsx
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '../components/common/Button';
 import { LoadingState } from '../components/common/LoadingState';
 import { generateReceipt } from '../utils/receipt';
 import { DownloadIcon, FileTextIcon, XCircleIcon, EyeIcon } from 'lucide-react';
 import { FloatingButton } from '../components/common/FloatingButton';
-import type { Booking, Receipt, TourDetails } from '../types';
+import type { Booking, Receipt} from '../types';
 
 // Simulated API for bookings
 const fetchBookings = async (userId: string): Promise<Booking[]> => {

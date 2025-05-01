@@ -368,4 +368,10 @@ export interface TourDetails {
   images: string[];
 }
 
+export interface ClientDetails {
+  name: string;
+  email: string;
+  phone: string;
+}
+
 

@@ -1,11 +1,9 @@
-import { useState, useEffect, useContext, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { tours, Tour, Booking, Receipt, ClientDetails } from '../types'; // Import from index.ts
 import { generateReceipt } from '../utils/receipt';
 import { LoadingState } from '../components/common/LoadingState';
-import { LanguageContext } from '../contexts/LanguageContext';
-
-type Language = 'en' | 'fr' | 'rw';
+import { useLanguage } from '../contexts/LanguageContext';
 
 // Extend Receipt type to include specialRequests
 interface ExtendedReceipt extends Receipt {
@@ -122,8 +120,7 @@ const RegisterForm = ({
 };
 
 const TourSlideshow = () => {
-  const context = useContext(LanguageContext);
-  const language = context?.language || 'en';
+  const { language } = useLanguage();
   const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
@@ -160,8 +157,8 @@ const TourSlideshow = () => {
               style={{ backgroundImage: `url(${tour.images[0] || tour.image || '/people.jpg'})` }}
             >
               <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-end p-6">
-                <h3 className="text-2xl font-bold text-white">{tour.title[language as Language]}</h3>
-                <p className="text-white">{tour.description[language as Language].slice(0, 100)}...</p>
+                <h3 className="text-2xl font-bold text-white">{tour.title[language]}</h3>
+                <p className="text-white">{tour.description[language].slice(0, 100)}...</p>
               </div>
             </div>
           ))}
@@ -186,8 +183,7 @@ const TourSlideshow = () => {
 };
 
 const Testimonials = () => {
-  const context = useContext(LanguageContext);
-  const language = context?.language || 'en';
+  const { language } = useLanguage();
   const testimonials = useMemo(
     () => [
       {
@@ -233,7 +229,7 @@ const Testimonials = () => {
             className="bg-white shadow-lg rounded-lg p-6 animate-slide-up"
             style={{ animationDelay: `${index * 0.1}s` }}
           >
-            <p className="text-gray-600 italic">"{testimonial.text[language as Language]}"</p>
+            <p className="text-gray-600 italic">"{testimonial.text[language]}"</p>
             <p className="mt-4 font-semibold text-gray-800">{testimonial.name}</p>
             <div className="flex mt-2">
               {[...Array(testimonial.rating)].map((_, i) => (
@@ -258,8 +254,7 @@ const TourCard = ({
   onSelect: (id: number) => void;
   clientDetails: ClientDetails | null;
 }) => {
-  const context = useContext(LanguageContext);
-  const language = context?.language || 'en';
+  const { language } = useLanguage();
   const [isExpanded, setIsExpanded] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(Math.floor(Math.random() * 100));
@@ -288,10 +283,8 @@ const TourCard = ({
 
   const handleShare = useCallback(async () => {
     const shareData = {
-      title: tour.title[language as Language],
-      text: `Check out this amazing tour: ${tour.title[language as Language]}! ${tour.description[
-        language as Language
-      ].slice(0, 100)}...`,
+      title: tour.title[language],
+      text: `Check out this amazing tour: ${tour.title[language]}! ${tour.description[language].slice(0, 100)}...`,
       url: `https://kivu-safaris.com/tours/${tour.id}`,
     };
     if (navigator.share) {
@@ -354,7 +347,7 @@ const TourCard = ({
       <div className="relative w-full h-48 mb-4">
         <img
           src={tour.images[currentImageIndex] || tour.image || 'https://via.placeholder.com/300x200'}
-          alt={tour.title[language as Language]}
+          alt={tour.title[language]}
           className="w-full h-full object-cover rounded-lg transition-opacity duration-500"
         />
         <div className="absolute top-2 right-2 flex space-x-2">
@@ -394,8 +387,8 @@ const TourCard = ({
           </button>
         </div>
       </div>
-      <h3 className="text-xl font-semibold text-gray-800">{tour.title[language as Language]}</h3>
-      <p className="text-gray-600 mt-2 line-clamp-3">{tour.description[language as Language]}</p>
+      <h3 className="text-xl font-semibold text-gray-800">{tour.title[language]}</h3>
+      <p className="text-gray-600 mt-2 line-clamp-3">{tour.description[language]}</p>
       <p className="text-teal-600 font-bold mt-2">${tour.price} {tour.currency}</p>
       <p className="text-gray-600 mt-1">Duration: {tour.duration}</p>
       <p className="text-gray-600 mt-1">Location: {tour.location}</p>
@@ -403,7 +396,7 @@ const TourCard = ({
         <button
           onClick={() => onSelect(tour.id)}
           className="flex-1 bg-teal-600 text-white p-2 rounded-lg hover:bg-teal-700 transition-colors transform hover:scale-105 duration-200"
-          aria-label={`Book ${tour.title[language as Language]}`}
+          aria-label={`Book ${tour.title[language]}`}
         >
           Book Now
         </button>
@@ -417,7 +410,7 @@ const TourCard = ({
         <button
           onClick={() => setShowInviteForm(true)}
           className="flex-1 bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition-colors transform hover:scale-105 duration-200"
-          aria-label={`Invite a friend to ${tour.title[language as Language]}`}
+          aria-label={`Invite a friend to ${tour.title[language]}`}
         >
           Invite a Friend
         </button>
@@ -440,7 +433,7 @@ const TourCard = ({
               </svg>
             </button>
             <h3 id="invite-form-title" className="text-2xl font-bold text-gray-800 mb-6">
-              Invite a Friend to {tour.title[language as Language]}
+              Invite a Friend to {tour.title[language]}
             </h3>
             <form onSubmit={handleInvite} className="space-y-6" noValidate>
               <div className="relative">
@@ -546,7 +539,7 @@ const TourCard = ({
             {tour.itinerary.map((item) => (
               <div key={item.day} className="mt-2">
                 <p className="font-medium text-gray-800">Day {item.day}</p>
-                <p className="text-gray-600">{item.description[language as Language]}</p>
+                <p className="text-gray-600">{item.description[language]}</p>
               </div>
             ))}
           </div>
@@ -581,8 +574,7 @@ const BookingForm = ({
   onSubmit: (data: BookingFormData) => void;
   initialData?: Partial<Booking>;
 }) => {
-  const context = useContext(LanguageContext);
-  const language = context?.language || 'en';
+  const { language } = useLanguage();
   const [formData, setFormData] = useState<BookingFormData>({
     tourDate: initialData?.tourDate || '',
     participants: initialData?.participants || tour.minParticipants,
@@ -590,22 +582,20 @@ const BookingForm = ({
     depositPaid: initialData?.depositPaid || false,
     specialRequests: initialData?.specialRequests || '',
   });
-  const [errors, setErrors] = useState<Partial<BookingFormData>>({});
+  const [errors, setErrors] = useState<Partial<Record<keyof BookingFormData, string>>>({});
 
   const validate = useCallback(
-    (data: BookingFormData): Partial<BookingFormData> => {
-      const newErrors: Partial<BookingFormData> = {};
-      const today = new Date().toISOString().split('T')[0];
-      if (!data.tourDate || data.tourDate < today) newErrors.tourDate = 'Please select a future date';
-      if (data.participants < tour.minParticipants)
-        newErrors.participants = `At least ${tour.minParticipants} participants are required`;
-      if (data.participants > tour.maxParticipants)
-        newErrors.participants = `Maximum ${tour.maxParticipants} participants allowed`;
-      if (!data.paymentMethod) newErrors.paymentMethod = 'Please select a payment method';
-      return newErrors;
-    },
-    [tour.minParticipants, tour.maxParticipants]
-  );
+      (data: BookingFormData): Partial<Record<keyof BookingFormData, string>> => {
+        const newErrors: Partial<Record<keyof BookingFormData, string>> = {};
+        const today = new Date().toISOString().split('T')[0];
+        if (!data.tourDate || data.tourDate < today) newErrors.tourDate = 'Please select a future date';
+        if (data.participants > tour.maxParticipants)
+          newErrors.participants = `Maximum participants allowed: ${tour.maxParticipants}`;
+        if (!data.paymentMethod) newErrors.paymentMethod = 'Please select a payment method';
+        return newErrors;
+      },
+      [tour.minParticipants, tour.maxParticipants]
+    );
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -639,7 +629,7 @@ const BookingForm = ({
 
   return (
     <div className="bg-white shadow-lg rounded-lg p-6 animate-slide-up">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">Book {tour.title[language as Language]}</h2>
+      <h2 className="text-2xl font-bold text-gray-800 mb-6">Book {tour.title[language]}</h2>
       <form onSubmit={handleSubmit} className="space-y-6" noValidate>
         <div className="relative">
           <select
@@ -805,11 +795,7 @@ const ErrorToast = ({ message, onClose }: { message: string; onClose: () => void
 };
 
 const BookingEntry = () => {
-  const context = useContext(LanguageContext);
-  if (!context) {
-    throw new Error('LanguageContext is undefined, make sure you are using LanguageProvider');
-  }
-  const language = context.language as Language;
+  const { language } = useLanguage();
   const [step, setStep] = useState<'register' | 'select-tour' | 'book' | 'confirmed'>('register');
   const [selectedTourId, setSelectedTourId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -1036,7 +1022,7 @@ const BookingEntry = () => {
           <BookingForm
             tour={tour}
             onSubmit={bookingDetails ? handleBookingUpdate : handleBookingSubmit}
-            initialData={bookingDetails}
+            initialData={bookingDetails || undefined}
           />
         </div>
         {error && <ErrorToast message={error} onClose={() => setError(null)} />}
@@ -1055,7 +1041,7 @@ const BookingEntry = () => {
           </p>
           <div className="text-left space-y-2 mb-6">
             <p>
-              <strong>Tour:</strong> {tour?.title[language as Language] || 'Unknown Tour'}
+              <strong>Tour:</strong> {tour?.title[language] || 'Unknown Tour'}
             </p>
             <p>
               <strong>Date:</strong> {bookingDetails.tourDate}

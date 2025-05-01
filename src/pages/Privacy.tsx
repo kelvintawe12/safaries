@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { privacySections } from '../data/privacy';
 import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
 
@@ -18,6 +18,7 @@ const LanguageButton = ({
       currentLang === lang ? 'bg-teal-700 text-white' : 'bg-gray-200 text-gray-700'
     }`}
     onClick={() => onClick(lang)}
+    aria-label={`Switch to ${label}`}
   >
     {label}
   </button>
@@ -91,27 +92,35 @@ export const Privacy = () => {
               </p>
             </div>
             <div className="space-y-6">
-              {privacySections.map((section) => (
-                <div key={section.id} className="border border-gray-200 rounded-lg overflow-hidden">
-                  <button
-                    className="flex justify-between items-center w-full p-4 text-left bg-white hover:bg-gray-50 transition-colors"
-                    onClick={() => toggleSection(section.id)}
-                    aria-expanded={activeId === section.id}
-                  >
-                    <span className="font-medium text-xl">{section.title[language]}</span>
-                    {activeId === section.id ? (
-                      <ChevronUpIcon className="h-5 w-5 text-gray-500" />
-                    ) : (
-                      <ChevronDownIcon className="h-5 w-5 text-gray-500" />
+              {privacySections && privacySections.length > 0 ? (
+                privacySections.map((section) => (
+                  <div key={section.id} className="border border-gray-200 rounded-lg overflow-hidden">
+                    <button
+                      className="flex justify-between items-center w-full p-4 text-left bg-white hover:bg-gray-50 transition-colors"
+                      onClick={() => toggleSection(section.id)}
+                      aria-expanded={activeId === section.id}
+                      aria-controls={`section-content-${section.id}`}
+                    >
+                      <span className="font-medium text-xl">{section.title[language]}</span>
+                      {activeId === section.id ? (
+                        <ChevronUpIcon className="h-5 w-5 text-gray-500" />
+                      ) : (
+                        <ChevronDownIcon className="h-5 w-5 text-gray-500" />
+                      )}
+                    </button>
+                    {activeId === section.id && (
+                      <div
+                        id={`section-content-${section.id}`}
+                        className="p-4 bg-gray-50 border-t border-gray-200"
+                      >
+                        <div className="prose prose-gray">{section.content[language]}</div>
+                      </div>
                     )}
-                  </button>
-                  {activeId === section.id && (
-                    <div className="p-4 bg-gray-50 border-t border-gray-200">
-                      <div className="prose prose-gray">{section.content[language]}</div>
-                    </div>
-                  )}
-                </div>
-              ))}
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-600">No privacy policy sections available at the moment.</p>
+              )}
             </div>
 
             {/* Contact Section */}

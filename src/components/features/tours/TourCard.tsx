@@ -1,5 +1,5 @@
 // Description: This component displays a card for a tour, including images, title, metadata, rating, tags, description, and action buttons.
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Tour } from '../../../types';
 import { useLanguage } from '../../../contexts/LanguageContext';
@@ -27,14 +27,25 @@ const Slideshow = ({
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (isPaused) return;
-    const timer = setInterval(() => {
+    intervalRef.current = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % images.length);
     }, interval);
-    return () => clearInterval(timer);
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
   }, [images.length, interval, isPaused]);
+
+  if (!images || images.length === 0) {
+    return (
+      <div className="relative h-64 w-full bg-gray-200 flex items-center justify-center">
+        <p className="text-gray-500">No images available</p>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -77,9 +88,10 @@ export const TourCard = ({ tour }: TourCardProps) => {
   const { t, language } = useLanguage();
 
   // Get next available date
-  const nextDate = (tour.availableDates?.length ?? 0) > 0
-    ? new Date(tour.availableDates.sort()[0]).toLocaleDateString(language)
-    : t('tourCard.noDates');
+  const nextDate =
+    (tour.availableDates?.length ?? 0) > 0
+      ? new Date(tour.availableDates.sort()[0]).toLocaleDateString(language)
+      : t('tourCard.noDates');
 
   return (
     <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300 animate-slide-up">

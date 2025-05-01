@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { faqs } from '../data/faqs';
 import { ChevronDownIcon, ChevronUpIcon, SearchIcon } from 'lucide-react';
 
@@ -17,6 +17,7 @@ const LanguageSelector = ({
           language === lang ? 'bg-teal-700 text-white' : 'bg-gray-200 text-gray-700'
         }`}
         onClick={() => setLanguage(lang as 'en' | 'fr' | 'rw')}
+        aria-label={`Switch to ${lang === 'en' ? 'English' : lang === 'fr' ? 'Français' : 'Kinyarwanda'}`}
       >
         {lang === 'en' ? 'English' : lang === 'fr' ? 'Français' : 'Kinyarwanda'}
       </button>
@@ -40,6 +41,7 @@ const FAQAccordion = ({
       className="flex justify-between items-center w-full p-4 text-left bg-white hover:bg-gray-50 transition-colors"
       onClick={() => toggleAccordion(faq.id)}
       aria-expanded={activeId === faq.id}
+      aria-controls={`faq-content-${faq.id}`}
     >
       <div>
         <span className="font-medium text-lg">{faq.question[language]}</span>
@@ -54,7 +56,10 @@ const FAQAccordion = ({
       )}
     </button>
     {activeId === faq.id && (
-      <div className="p-4 bg-gray-50 border-t border-gray-200">
+      <div
+        id={`faq-content-${faq.id}`}
+        className="p-4 bg-gray-50 border-t border-gray-200"
+      >
         <p className="text-gray-700">{faq.answer[language]}</p>
       </div>
     )}
@@ -106,6 +111,7 @@ export const FAQ = () => {
                 className="pl-10 pr-4 py-2 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-teal-500"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                aria-label="Search FAQs"
               />
             </div>
             <LanguageSelector language={language} setLanguage={setLanguage} />
@@ -173,6 +179,7 @@ export const FAQ = () => {
           <a
             href="/contact"
             className="inline-block bg-teal-700 text-white px-6 py-3 rounded-md font-medium hover:bg-teal-800 transition-colors"
+            aria-label="Contact Us"
           >
             Contact Us
           </a>

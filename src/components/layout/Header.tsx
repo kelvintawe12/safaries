@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { MenuIcon, XIcon, GlobeIcon } from 'lucide-react';
 
@@ -12,6 +12,8 @@ const navLinks = [
   { path: '/gallery', label: 'Gallery' },
 ];
 
+const supportedLanguages = ['en', 'fr', 'rw'];
+
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [language, setLanguage] = useState('en');
@@ -21,8 +23,10 @@ export const Header = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  const changeLanguage = (lang: string) => {
-    setLanguage(lang);
+  const changeLanguage = () => {
+    const currentIndex = supportedLanguages.indexOf(language);
+    const nextIndex = (currentIndex + 1) % supportedLanguages.length;
+    setLanguage(supportedLanguages[nextIndex]);
   };
 
   // Focus trapping for mobile menu
@@ -88,19 +92,14 @@ export const Header = () => {
         {/* Desktop Actions */}
         <div className="hidden md:flex items-center space-x-4">
           {/* Language Selector */}
-          <div className="relative">
-            <button
-              className="flex items-center text-gray-700 hover:text-teal-700 transition-colors"
-              onClick={() => {
-                const nextLang = language === 'en' ? 'fr' : language === 'fr' ? 'rw' : 'en';
-                changeLanguage(nextLang);
-              }}
-              aria-label="Change language"
-            >
-              <GlobeIcon className="h-5 w-5 mr-1" />
-              <span className="uppercase">{language}</span>
-            </button>
-          </div>
+          <button
+            className="flex items-center text-gray-700 hover:text-teal-700 transition-colors"
+            onClick={changeLanguage}
+            aria-label="Change language"
+          >
+            <GlobeIcon className="h-5 w-5 mr-1" />
+            <span className="uppercase">{language}</span>
+          </button>
 
           {/* Book Now Button */}
           <Link
@@ -150,10 +149,7 @@ export const Header = () => {
                 {/* Language Selector */}
                 <button
                   className="flex items-center text-gray-700"
-                  onClick={() => {
-                    const nextLang = language === 'en' ? 'fr' : language === 'fr' ? 'rw' : 'en';
-                    changeLanguage(nextLang);
-                  }}
+                  onClick={changeLanguage}
                   aria-label="Change language"
                 >
                   <GlobeIcon className="h-5 w-5 mr-1" />

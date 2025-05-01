@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+
 import { Link } from 'react-router-dom';
 import { Hero } from '../components/features/hero/Hero';
 import { TourCard } from '../components/features/tours/TourCard';
