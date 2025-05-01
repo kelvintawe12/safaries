@@ -13,10 +13,10 @@ import { NotFound } from './pages/NotFound';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { FloatingButtons } from './components/common/FloatingButtons';
 import { Rules } from './pages/Rules';
-import { MyBookings } from './pages/MyBookings';
+import  MyBookings  from './pages/MyBookings';
 import RegisterForm from './components/forms/RegisterForm'
 import BookingForm from './components/forms/BookingForm';
-import { BookingEntry } from './pages/BookingEntry';
+import  BookingEntry  from './pages/BookingEntry';
 
 export function App() {
   return <LanguageProvider>

@@ -69,7 +69,10 @@ export interface Booking {
   paymentMethod: 'credit_card' | 'bank_transfer' | 'cash';
   totalPrice: number;
   depositPaid: boolean;
+  tourTitle?: string; 
   createdAt: string;
+  bookingDate?: string;
+  image?: string;
 }
 export interface Receipt {
   id: string;
