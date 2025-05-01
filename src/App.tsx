@@ -16,6 +16,8 @@ import { Rules } from './pages/Rules';
 import { MyBookings } from './pages/MyBookings';
 import RegisterForm from './components/forms/RegisterForm'
 import BookingForm from './components/forms/BookingForm';
+import { BookingEntry } from './pages/BookingEntry';
+
 export function App() {
   return <LanguageProvider>
       <BrowserRouter>
@@ -24,6 +26,7 @@ export function App() {
           <main className="flex-grow">
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/booking-entry" element={<BookingEntry />} />
               <Route path="/booking-form" element={<BookingForm tours={[]} onSubmit={async () => Promise.resolve()} />} />
               <Route path="/register" element={<RegisterForm/>} />
               <Route path="/about" element={<About />} />

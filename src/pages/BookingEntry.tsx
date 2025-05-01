@@ -5,9 +5,11 @@ import { generateReceipt } from '../utils/receipt';
 import { LoadingState } from '../components/common/LoadingState';
 import { Link } from 'react-router-dom';
 import { tours } from '../data/tours';
+import type { Booking, Receipt } from '../types';
 
 export const BookingEntry = () => {
   const [registrationComplete, setRegistrationComplete] = useState(false);
+  const [selectedTourId, setSelectedTourId] = useState<number | null>(null);
   const [bookingComplete, setBookingComplete] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [receiptUrl, setReceiptUrl] = useState<string | null>(null);
@@ -25,17 +27,15 @@ export const BookingEntry = () => {
     }
   };
 
+  const handleTourSelect = (tourId: number) => {
+    setSelectedTourId(tourId);
+  };
+
   const handleBookingSubmit = async (data: any) => {
+    if (selectedTourId === null) return;
     setIsLoading(true);
     try {
       // Simulate booking API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      // Generate receipt
-      const receiptBlob = await generateReceipt({
-        id: 'rec_123',
-        bookingId: 123,
-        uniqueId: 'unique_123',
-        clientDetails: {
           name: 'John Doe',
           email: 'john@example.com',
           phone: '+243123456789'
