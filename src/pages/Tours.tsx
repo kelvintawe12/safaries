@@ -18,10 +18,9 @@ import {
 import { TourCard } from '../components/features/tours/TourCard';
 import { tours } from '../data/tours';
 import { useLanguage } from '../contexts/LanguageContext';
-import { Tour } from '../types';
 
 // Simulated API with error handling
-const fetchTours = async (): Promise<Tour[]> => {
+const fetchTours = async () => {
   try {
     await new Promise((resolve) => setTimeout(resolve, 500));
     return tours;
@@ -64,7 +63,7 @@ const Slideshow = () => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
     }, 5000);
     return () => clearInterval(interval);
-  }, [slides.length]);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -86,8 +85,6 @@ const Slideshow = () => {
       ref={heroRef}
       className="relative h-[500px] md:h-[600px]"
       style={{ backgroundPosition: 'center' }}
-      role="region"
-      aria-label={t('slideshow.section')}
     >
       {slides.map((slide, index) => (
         <div
@@ -98,7 +95,7 @@ const Slideshow = () => {
         >
           <img src={slide.image} alt={slide.alt} className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-            <Link to="/tours" className="focus:outline-none focus:ring-2 focus:ring-teal-500">
+            <Link to="/tours">
               <p className="text-white text-xl md:text-3xl font-semibold text-center px-4 animate-slide-up">
                 {slide.caption}
               </p>
@@ -115,20 +112,19 @@ const Slideshow = () => {
               index === currentSlide ? 'bg-coral-500' : 'bg-gray-300'
             }`}
             aria-label={t('slideshow.goToSlide', { number: String(index + 1) })}
-            aria-current={index === currentSlide}
-          />
+          ></button>
         ))}
       </div>
       <button
         onClick={goPrev}
-        className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-teal-600 text-white p-2 rounded-full hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500"
+        className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-teal-600 text-white p-2 rounded-full hover:bg-teal-700"
         aria-label={t('slideshow.prev')}
       >
         <ChevronLeftIcon className="h-6 w-6" />
       </button>
       <button
         onClick={goNext}
-        className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-teal-600 text-white p-2 rounded-full hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500"
+        className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-teal-600 text-white p-2 rounded-full hover:bg-teal-700"
         aria-label={t('slideshow.next')}
       >
         <ChevronRightIcon className="h-6 w-6" />
@@ -163,8 +159,8 @@ const Toast = ({
       <p className="flex-1">{message}</p>
       <button
         onClick={onClose}
-        className="ml-3 text-white hover:text-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-white"
-        aria-label={t('common.closeNotification')}
+        className="ml-3 text-white hover:text-gray-200 transition-colors"
+        aria-label="Close notification"
       >
         ×
       </button>
@@ -187,8 +183,6 @@ const ReasonCard = ({
   <div
     className="bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 animate-slide-up"
     style={{ animationDelay: `${index * 0.1}s` }}
-    role="article"
-    aria-label={title}
   >
     <div className="inline-flex items-center justify-center w-12 h-12 bg-teal-100 text-teal-700 rounded-full mb-4">
       {icon}
@@ -232,14 +226,13 @@ const TestimonialCarousel = () => {
   }, [testimonials.length]);
 
   return (
-    <div className="relative max-w-3xl mx-auto" role="region" aria-label={t('testimonials.section')}>
+    <div className="relative max-w-3xl mx-auto">
       {testimonials.map((testimonial, index) => (
         <div
           key={index}
           className={`transition-opacity duration-1000 ${
             index === current ? 'opacity-100' : 'opacity-0 absolute'
           }`}
-          aria-hidden={index !== current}
         >
           <div className="bg-white p-6 rounded-xl shadow-lg text-center animate-slide-up">
             <img
@@ -255,7 +248,6 @@ const TestimonialCarousel = () => {
                   className={`h-5 w-5 ${
                     i < testimonial.rating ? 'text-yellow-400' : 'text-gray-300'
                   }`}
-                  aria-hidden="true"
                 />
               ))}
             </div>
@@ -267,12 +259,6 @@ const TestimonialCarousel = () => {
   );
 };
 
-interface PriceRange {
-  label: string;
-  min: number;
-  max: number;
-}
-
 export const Tours = () => {
   const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
@@ -282,16 +268,15 @@ export const Tours = () => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedDate, setSelectedDate] = useState('');
   const [sortBy, setSortBy] = useState('default');
-  const [toursData, setToursData] = useState<Tour[]>([]);
+  const [toursData, setToursData] = useState(tours);
   const [page, setPage] = useState(1);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const [toast, setToast] = useState<{ show: boolean; message: string; type: 'success' | 'error' } | null>(null);
 
   const locations = [...new Set(tours.map((tour) => tour.location))];
   const durations = [...new Set(tours.map((tour) => tour.duration))];
   const categories = ['Wildlife', 'Cultural', 'Adventure', 'Relaxation'];
-  const priceRanges: PriceRange[] = [
+  const priceRanges = [
     { label: t('filter.priceUnder300'), min: 0, max: 300 },
     { label: t('filter.price300to500'), min: 300, max: 500 },
     { label: t('filter.priceOver500'), min: 500, max: Infinity },
@@ -299,72 +284,55 @@ export const Tours = () => {
 
   // Load filters from localStorage
   useEffect(() => {
-    try {
-      const savedFilters = localStorage.getItem('tourFilters');
-      if (savedFilters) {
-        const { searchQuery, location, duration, priceRange, category, date } = JSON.parse(savedFilters);
-        setSearchQuery(searchQuery || '');
-        setSelectedLocation(location || '');
-        setSelectedDuration(duration || '');
-        setPriceRange(priceRange || '');
-        setSelectedCategory(category || '');
-        setSelectedDate(date || '');
-        setToast({ show: true, message: t('filter.restored'), type: 'success' });
-      }
-    } catch (error) {
-      console.warn('Failed to load filters from localStorage:', error);
+    const savedFilters = localStorage.getItem('tourFilters');
+    if (savedFilters) {
+      const { searchQuery, location, duration, priceRange, category, date } = JSON.parse(savedFilters);
+      setSearchQuery(searchQuery || '');
+      setSelectedLocation(location || '');
+      setSelectedDuration(duration || '');
+      setPriceRange(priceRange || '');
+      setSelectedCategory(category || '');
+      setSelectedDate(date || '');
+      setToast({ show: true, message: t('filter.restored'), type: 'success' });
     }
   }, [t]);
 
   // Save filters to localStorage
   useEffect(() => {
     const timeout = setTimeout(() => {
-      try {
-        localStorage.setItem(
-          'tourFilters',
-          JSON.stringify({
-            searchQuery,
-            location: selectedLocation,
-            duration: selectedDuration,
-            priceRange: selectedPriceRange,
-            category: selectedCategory,
-            date: selectedDate,
-          })
-        );
-      } catch (error) {
-        console.warn('Failed to save filters to localStorage:', error);
-      }
+      localStorage.setItem(
+        'tourFilters',
+        JSON.stringify({
+          searchQuery,
+          location: selectedLocation,
+          duration: selectedDuration,
+          priceRange: selectedPriceRange,
+          category: selectedCategory,
+          date: selectedDate,
+        })
+      );
     }, 1000);
     return () => clearTimeout(timeout);
   }, [searchQuery, selectedLocation, selectedDuration, selectedPriceRange, selectedCategory, selectedDate]);
 
   // Fetch tours
   useEffect(() => {
-    setIsLoading(true);
     fetchTours()
-      .then((data) => {
-        setToursData(data);
-        setIsLoading(false);
-      })
-      .catch(() => {
-        setToast({ show: true, message: t('filter.loadError'), type: 'error' });
-        setIsLoading(false);
-      });
+      .then((data) => setToursData(data))
+      .catch(() => setToast({ show: true, message: t('filter.loadError'), type: 'error' }));
   }, [t]);
 
   // Filter and sort tours
   const filteredTours = toursData
     .filter((tour) => {
       const matchesSearch =
-        (tour.title.en || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (tour.description.en || '').toLowerCase().includes(searchQuery.toLowerCase());
+        (tour.title?.en ?? '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (tour.description?.en ?? '').toLowerCase().includes(searchQuery.toLowerCase());
       const matchesLocation = !selectedLocation || tour.location === selectedLocation;
       const matchesDuration = !selectedDuration || tour.duration === selectedDuration;
       const matchesPrice =
         !selectedPriceRange ||
-        priceRanges.some(
-          (range) => range.label === selectedPriceRange && tour.price >= range.min && tour.price <= range.max
-        );
+        priceRanges.find((range) => range.label === selectedPriceRange && tour.price >= range.min && tour.price <= range.max);
       const matchesCategory = !selectedCategory || tour.category === selectedCategory;
       const matchesDate = !selectedDate || tour.availableDates?.includes(selectedDate);
       return matchesSearch && matchesLocation && matchesDuration && matchesPrice && matchesCategory && matchesDate;
@@ -372,11 +340,7 @@ export const Tours = () => {
     .sort((a, b) => {
       if (sortBy === 'price-asc') return a.price - b.price;
       if (sortBy === 'price-desc') return b.price - a.price;
-      if (sortBy === 'duration') {
-        const durationA = parseInt(a.duration) || 0;
-        const durationB = parseInt(b.duration) || 0;
-        return durationA - durationB;
-      }
+      if (sortBy === 'duration') return parseInt(a.duration) - parseInt(b.duration);
       if (sortBy === 'rating') return (b.rating || 0) - (a.rating || 0);
       return 0;
     });
@@ -394,29 +358,8 @@ export const Tours = () => {
     setSortBy('default');
     setPage(1);
     setToast({ show: true, message: t('filter.cleared'), type: 'success' });
-    try {
-      localStorage.removeItem('tourFilters');
-    } catch (error) {
-      console.warn('Failed to remove filters from localStorage:', error);
-    }
+    localStorage.removeItem('tourFilters');
   };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="animate-spin h-8 w-8 text-teal-600" role="status" aria-label={t('common.loading')}>
-          <svg viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-            <path
-              className="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            />
-          </svg>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="bg-gray-100 min-h-screen relative overflow-x-hidden">
@@ -438,9 +381,8 @@ export const Tours = () => {
         <div className="container mx-auto px-4">
           <button
             onClick={() => setIsFilterOpen(!isFilterOpen)}
-            className="md:hidden mb-4 bg-teal-600 text-white px-4 py-2 rounded-lg flex items-center focus:outline-none focus:ring-2 focus:ring-teal-500"
+            className="md:hidden mb-4 bg-teal-600 text-white px-4 py-2 rounded-lg flex items-center"
             aria-label={t('filter.toggle')}
-            aria-expanded={isFilterOpen}
           >
             <FilterIcon className="h-5 w-5 mr-2" />
             {isFilterOpen ? t('filter.hide') : t('filter.show')}
@@ -566,14 +508,13 @@ export const Tours = () => {
                     style={{ animationDelay: `${index * 0.1}s` }}
                   >
                     <TourCard tour={tour} />
-                    <div className="mt-2 flex justify-center items-center">
+                    <div className="mt-2 flex justify-center">
                       {Array.from({ length: 5 }).map((_, i) => (
                         <StarIcon
                           key={i}
                           className={`h-5 w-5 ${
                             i < (tour.rating || 0) ? 'text-yellow-400' : 'text-gray-300'
                           }`}
-                          aria-hidden="true"
                         />
                       ))}
                       <span className="ml-2 text-gray-600">({tour.reviews || 0} {t('booking.reviews')})</span>
@@ -664,9 +605,8 @@ export const Tours = () => {
               <Link
                 key={dest.name}
                 to={dest.link}
-                className="relative rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300 animate-slide-up focus:outline-none focus:ring-2 focus:ring-teal-500"
+                className="relative rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300 animate-slide-up"
                 style={{ animationDelay: `${index * 0.1}s` }}
-                aria-label={t('destinations.link', { name: dest.name })}
               >
                 <img src={dest.image} alt={dest.name} className="w-full h-64 object-cover" />
                 <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
@@ -690,22 +630,22 @@ export const Tours = () => {
               <h3 className="text-2xl font-bold mb-4">{t('footer.quickLinks')}</h3>
               <ul className="space-y-2">
                 <li>
-                  <Link to="/" className="text-gray-300 hover:text-white transition-colors focus:outline-none focus:underline">
+                  <Link to="/" className="text-gray-300 hover:text-white transition-colors">
                     {t('footer.links.home')}
                   </Link>
                 </li>
                 <li>
-                  <Link to="/tours" className="text-gray-300 hover:text-white transition-colors focus:outline-none focus:underline">
+                  <Link to="/tours" className="text-gray-300 hover:text-white transition-colors">
                     {t('footer.links.tours')}
                   </Link>
                 </li>
                 <li>
-                  <Link to="/about" className="text-gray-300 hover:text-white transition-colors focus:outline-none focus:underline">
+                  <Link to="/about" className="text-gray-300 hover:text-white transition-colors">
                     {t('footer.links.about')}
                   </Link>
                 </li>
                 <li>
-                  <Link to="/contact" className="text-gray-300 hover:text-white transition-colors focus:outline-none focus:underline">
+                  <Link to="/contact" className="text-gray-300 hover:text-white transition-colors">
                     {t('footer.links.contact')}
                   </Link>
                 </li>
@@ -757,7 +697,7 @@ export const Tours = () => {
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-gray-300 hover:text-white transform hover:scale-110 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white"
+                    className="text-gray-300 hover:text-white transform hover:scale-110 transition-all duration-200"
                     aria-label={social.label}
                   >
                     {social.icon}
