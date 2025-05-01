@@ -27,9 +27,7 @@ export const generateUniqueId = (phoneNumber: string): string => {
 
 const addCompanyLogo = (doc: jsPDF, currentY: number) => {
   try {
-    // In real implementation, replace with actual base64 logo
-    const logoBase64 = 'data:image/png;base64,...';
-    doc.addImage(logoBase64, 'PNG', MARGIN, currentY, 30, 30);
+    // Replace with actual base64 logo string or import
     return currentY + 30 + SECTION_SPACING;
   } catch (error) {
     console.error('Failed to add logo:', error);

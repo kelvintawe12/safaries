@@ -199,9 +199,12 @@ const MyBookings = () => {
         ).toLocaleString('en-US', { weekday: 'short' })}`,
         clientDetails: booking.clientDetails,
         tourDetails: {
-          title: typeof booking.tourTitle === 'string'
-            ? { en: booking.tourTitle, fr: booking.tourTitle, rw: booking.tourTitle }
-            : booking.tourDetails?.title || { en: 'Unknown Tour', fr: 'Unknown Tour', rw: 'Unknown Tour' },
+          title:
+            typeof booking.tourTitle === 'string'
+              ? { en: booking.tourTitle, fr: booking.tourTitle, rw: booking.tourTitle }
+              : typeof booking.tourDetails?.title === 'string'
+              ? { en: booking.tourDetails.title, fr: booking.tourDetails.title, rw: booking.tourDetails.title }
+              : booking.tourDetails?.title || { en: 'Unknown Tour', fr: 'Unknown Tour', rw: 'Unknown Tour' },
           date: booking.tourDate,
           participants: booking.participants,
           price: booking.totalPrice,
@@ -387,11 +390,11 @@ const MyBookings = () => {
                   <div className="p-6">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                       <div>
-                        <h3 className="text-xl font-semibold mb-2">
-                          {typeof booking.tourDetails?.title === 'string'
-                            ? booking.tourDetails.title
-                            : booking.tourDetails?.title?.en || booking.tourTitle || 'Unknown Tour'}
-                        </h3>
+          <h3 className="text-xl font-semibold mb-2">
+            {typeof booking.tourDetails?.title === 'string'
+              ? booking.tourDetails.title
+              : booking.tourDetails?.title?.en || booking.tourTitle || 'Unknown Tour'}
+          </h3>
                         <div className="space-y-1 text-gray-600">
                           <p>
                             <strong>Date:</strong>{' '}

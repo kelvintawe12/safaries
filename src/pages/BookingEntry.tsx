@@ -858,13 +858,26 @@ const BookingEntry = () => {
         ).toLocaleString('en-US', { weekday: 'short' })}`,
         clientDetails,
         tourDetails: {
-          title: tour.title,
+          title:
+            typeof tour.title === 'string'
+              ? { en: tour.title, fr: tour.title, rw: tour.title }
+              : tour.title,
           date: booking.tourDate,
           participants: booking.participants,
           price: booking.totalPrice,
           specialRequests: booking.specialRequests,
         },
+        paymentDetails: {
+          total: booking.totalPrice,
+          deposit: booking.depositPaid ? booking.totalPrice * 0.1 : 0,
+          balance: booking.depositPaid ? booking.totalPrice * 0.9 : booking.totalPrice,
+          currency: 'USD',
+          method: booking.paymentMethod,
+          transactionId: '',
+          paidAt: booking.createdAt,
+        },
         createdAt: booking.createdAt,
+        updatedAt: booking.createdAt,
       };
 
       const receiptBlob = await generateReceipt(receipt);
@@ -941,6 +954,11 @@ const BookingEntry = () => {
   }
 
   if (step === 'select-tour') {
+    const getTitle = (title: string | { en: string; fr: string; rw: string }) => {
+      if (typeof title === 'string') return title;
+      return title.en || 'Unknown Tour';
+    };
+
     return (
       <div className="min-h-screen bg-gray-100 py-8 px-4">
         <div className="max-w-5xl mx-auto">
@@ -954,7 +972,11 @@ const BookingEntry = () => {
                 className="animate-slide-up"
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
-                <TourCard tour={tour} onSelect={handleTourSelect} clientDetails={clientDetails} />
+                <TourCard
+                  tour={{ ...tour, title: getTitle(tour.title) }}
+                  onSelect={handleTourSelect}
+                  clientDetails={clientDetails}
+                />
               </div>
             ))}
           </div>
