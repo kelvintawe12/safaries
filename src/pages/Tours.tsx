@@ -34,7 +34,7 @@ const Slideshow = () => {
   const { t } = useLanguage();
   const slides = [
     {
-      image: 'https://images.unsplash.com/photo-1516426122075-c23e6d2db1dd?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
+      image: '/trav.jpg',
       caption: t('slideshow.virunga'),
       alt: t('slideshow.virungaAlt'),
     },
@@ -587,7 +587,7 @@ export const Tours = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {[
               {
-                image: 'https://images.unsplash.com/photo-1516426122075-c23e6d2db1dd?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
+                image: '/journey.jpg',
                 name: t('destinations.virunga'),
                 link: '/tours?location=Virunga',
               },

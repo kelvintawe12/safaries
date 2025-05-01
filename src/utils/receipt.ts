@@ -27,7 +27,7 @@ export const generateUniqueId = (phoneNumber: string): string => {
 
 const addCompanyLogo = (doc: jsPDF, currentY: number) => {
   try {
-    const logoBase64 = 'data:image/png;base64,...'; // Replace with actual base64 logo string
+    const logoBase64 = 'data:/welcome.jpg;base64,...'; // Replace with actual base64 logo string
     doc.addImage(logoBase64, 'PNG', MARGIN, currentY, 30, 30);
     return currentY + 30 + SECTION_SPACING;
   } catch (error) {
