@@ -1,3 +1,19 @@
+
+export interface FAQ {
+  id: number;
+  question: {
+    en: string;
+    fr: string;
+    rw: string;
+  };
+  answer: {
+    en: string;
+    fr: string;
+    rw: string;
+  };
+  category: string;
+}
+
 export interface Tour {
   id: number;
   title: {

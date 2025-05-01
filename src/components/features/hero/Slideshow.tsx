@@ -4,12 +4,16 @@ interface SlideshowProps {
   images: string[];
   interval?: number;
   autoplay?: boolean;
+  showDots?: boolean;
+  showArrows?: boolean;
   className?: string;
 }
 export const Slideshow = ({
   images,
   interval = 5000,
   autoplay = true,
+  showDots = true,
+  showArrows = true,
   className = ''
 }: SlideshowProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -36,16 +40,18 @@ export const Slideshow = ({
             <img src={image} alt={`Slide ${index + 1}`} className="w-full h-full object-cover" />
           </div>)}
         {/* Navigation arrows */}
-        <button className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white rounded-full p-2 transition-colors" onClick={goToPrevious} aria-label="Previous slide">
-          <ChevronLeftIcon className="h-6 w-6" />
-        </button>
-        <button className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white rounded-full p-2 transition-colors" onClick={goToNext} aria-label="Next slide">
-          <ChevronRightIcon className="h-6 w-6" />
-        </button>
+        {showArrows && <>
+          <button className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white rounded-full p-2 transition-colors" onClick={goToPrevious} aria-label="Previous slide">
+            <ChevronLeftIcon className="h-6 w-6" />
+          </button>
+          <button className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white rounded-full p-2 transition-colors" onClick={goToNext} aria-label="Next slide">
+            <ChevronRightIcon className="h-6 w-6" />
+          </button>
+        </>}
         {/* Indicators */}
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2">
+        {showDots && <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2">
           {images.map((_, index) => <button key={index} className={`h-2 w-2 rounded-full transition-colors ${index === currentIndex ? 'bg-white' : 'bg-white/50'}`} onClick={() => goToSlide(index)} aria-label={`Go to slide ${index + 1}`} />)}
-        </div>
+        </div>}
       </div>
     </div>;
 };
