@@ -102,7 +102,8 @@ const RegisterForm = ({ onProceed, onRegister }: { onProceed: () => void; onRegi
 };
 
 const TourSlideshow = () => {
-  const { language } = useContext(LanguageContext);
+  const languageContext = useContext(LanguageContext);
+  const language = languageContext?.language || 'en'; // Provide a default value like 'en'
   const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
@@ -155,7 +156,8 @@ const TourSlideshow = () => {
 };
 
 const Testimonials = () => {
-  const { language } = useContext(LanguageContext);
+  const languageContext = useContext(LanguageContext);
+  const language = languageContext?.language || 'en'; // Provide a default value like 'en'
   const testimonials = [
     {
       name: 'Sarah M.',
@@ -352,7 +354,7 @@ const TourCard = ({
           </button>
         </div>
       </div>
-      <h3 className="text-xl font-semibold text-gray-800">{tour.title[language]}</h3>
+          <h3 className="text-xl font-semibold text-gray-800">{tour.title[language as keyof typeof tour.title]}</h3>
       <p className="text-gray-600 mt-2 line-clamp-3">{tour.description[language]}</p>
       <p className="text-teal-600 font-bold mt-2">${tour.price} USD</p>
       <p className="text-gray-600 mt-1">Duration: {tour.duration}</p>
@@ -578,7 +580,7 @@ const BookingForm = ({
 
   return (
     <div className="bg-white shadow-lg rounded-lg p-6 animate-slide-up">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">Book {tour.title[language]}</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">Book {tour.title[language as keyof typeof tour.title]}</h2>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="relative">
           <select
@@ -592,9 +594,9 @@ const BookingForm = ({
             aria-describedby="tourDate-error"
           >
             <option value="" disabled>Select a date</option>
-            {tour.availableDates.map((date) => (
-              <option key={date} value={date}>{new Date(date).toLocaleDateString()}</option>
-            ))}
+          {(tour.availableDates || []).map((date) => (
+            <option key={date} value={date}>{new Date(date).toLocaleDateString()}</option>
+          ))}
           </select>
           <label
             className={`absolute left-3 -top-2.5 text-sm text-gray-600 transition-all duration-300 peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-teal-500 ${
@@ -718,7 +720,11 @@ const ErrorToast = ({ message, onClose }: { message: string; onClose: () => void
 };
 
 const BookingEntry = () => {
-  const { language } = useContext(LanguageContext);
+  const context = useContext(LanguageContext);
+  if (!context) {
+    throw new Error('LanguageContext is undefined, make sure you are using LanguageProvider');
+  }
+  const { language } = context;
   const [step, setStep] = useState<'register' | 'select-tour' | 'book' | 'confirmed'>('register');
   const [selectedTourId, setSelectedTourId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -955,7 +961,7 @@ const BookingEntry = () => {
           </p>
           <div className="text-left space-y-2 mb-6">
             <p>
-              <strong>Tour:</strong> {tour?.title[language] || 'Unknown Tour'}
+              <strong>Tour:</strong> {tour?.title[language as keyof typeof tour.title] || 'Unknown Tour'}
             </p>
             <p>
               <strong>Date:</strong> {bookingDetails.tourDate}
