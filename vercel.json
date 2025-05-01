@@ -1,0 +1,151 @@
+
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist",
+        "buildCommand": "npm run build",
+        "installCommand": "npm install",
+        "framework": "vite",
+        "outputDirectory": "dist",
+        "buildEnv": {
+          "NODE_ENV": "production",
+          "VITE_API_URL": "$API_URL"
+        }
+      }
+    },
+    {
+      "src": "api/**/*.ts",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": ["api/**"],
+        "maxLambdaSize": "50mb"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      "dest": "/api/$1",
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization"
+      }
+    },
+    {
+      "src": "/assets/(.*)",
+      "dest": "/assets/$1",
+      "headers": {
+        "Cache-Control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "src": "/(en|fr|rw)/(.*)",
+      "dest": "/$2",
+      "locale": {
+        "defaultLocale": "en",
+        "locales": ["en", "fr", "rw"]
+      }
+    },
+    {
+      "src": "/(.*\\.(jpg|png|svg|css|js|ico|woff2?))$",
+      "dest": "/$1",
+      "headers": {
+        "Cache-Control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html",
+      "headers": {
+        "Cache-Control": "public, max-age=0, must-revalidate"
+      }
+    }
+  ],
+  "error": {
+    "404": "/404.html",
+    "500": "/500.html",
+    "403": "/403.html",
+    "429": "/429.html"
+  },
+  "env": {
+    "API_URL": "https://api.kivusafaris.com",
+    "NODE_ENV": "production",
+    "SENTRY_DSN": "",
+    "GOOGLE_ANALYTICS_ID": ""
+  },
+  "buildEnv": {
+    "VITE_API_URL": "$API_URL",
+    "VITE_SENTRY_DSN": "$SENTRY_DSN",
+    "VITE_GOOGLE_ANALYTICS_ID": "$GOOGLE_ANALYTICS_ID"
+  },
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; img-src 'self' data: https://*.kivusafaris.com; script-src 'self' 'unsafe-inline' https://*.google-analytics.com https://*.sentry.io; style-src 'self' 'unsafe-inline'; font-src 'self' data:; connect-src 'self' https://api.kivusafaris.com https://*.sentry.io https://*.google-analytics.com"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=31536000; includeSubDomains; preload"
+        }
+      ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/old-tours",
+      "destination": "/tours",
+      "permanent": true
+    },
+    {
+      "source": "/book",
+      "destination": "/booking",
+      "permanent": false
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/server/(.*)",
+      "destination": "/api/$1"
+    }
+  ],
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "crons": [
+    {
+      "path": "/api/healthcheck",
+      "schedule": "0 0 * * *"
+    }
+  ],
+  "functions": {
+    "api/**/*.ts": {
+      "memory": 1024,
+      "maxDuration": 30,
+      "runtime": "nodejs18.x"
+    }
+  }
+}

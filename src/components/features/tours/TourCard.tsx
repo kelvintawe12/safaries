@@ -1,7 +1,7 @@
 // Description: This component displays a card for a tour, including images, title, metadata, rating, tags, description, and action buttons.
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Tour } from '../../../types';
+import  Tours  from '../../../types';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import { Button } from '../../common/Button';
 import {
