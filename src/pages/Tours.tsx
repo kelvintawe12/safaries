@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '../components/common/Button';
 import {
@@ -18,6 +17,7 @@ import {
 } from 'lucide-react';
 import { TourCard } from '../components/features/tours/TourCard';
 import { tours } from '../data/tours';
+import { useLanguage } from '../contexts/LanguageContext';
 
 // Simulated API with error handling
 const fetchTours = async () => {
@@ -31,26 +31,27 @@ const fetchTours = async () => {
 
 // Slideshow Component
 const Slideshow = () => {
+  const { t } = useLanguage();
   const slides = [
     {
       image: 'https://images.unsplash.com/photo-1516426122075-c23e6d2db1dd?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
-      caption: 'Discover Virunga National Park',
-      alt: 'Gorillas in Virunga',
+      caption: t('slideshow.virunga'),
+      alt: t('slideshow.virungaAlt'),
     },
     {
       image: 'https://images.unsplash.com/photo-1519659528534-7fd733a832a0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
-      caption: 'Sail across Lake Kivu',
-      alt: 'Lake Kivu sunset',
+      caption: t('slideshow.lakeKivu'),
+      alt: t('slideshow.lakeKivuAlt'),
     },
     {
       image: 'https://images.unsplash.com/photo-1504173010664-32509aeebb62?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
-      caption: 'Adventure in Nyungwe Forest',
-      alt: 'Nyungwe Forest canopy',
+      caption: t('slideshow.nyungwe'),
+      alt: t('slideshow.nyungweAlt'),
     },
     {
       image: 'https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
-      caption: 'Explore Idjwi Island',
-      alt: 'Idjwi Island landscape',
+      caption: t('slideshow.idjwi'),
+      alt: t('slideshow.idjwiAlt'),
     },
   ];
 
@@ -110,21 +111,21 @@ const Slideshow = () => {
             className={`w-3 h-3 rounded-full ${
               index === currentSlide ? 'bg-coral-500' : 'bg-gray-300'
             }`}
-            aria-label={`Go to slide ${index + 1}`}
+            aria-label={t('slideshow.goToSlide', { number: index + 1 })}
           ></button>
         ))}
       </div>
       <button
         onClick={goPrev}
         className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-teal-600 text-white p-2 rounded-full hover:bg-teal-700"
-        aria-label="Previous slide"
+        aria-label={t('slideshow.prev')}
       >
         <ChevronLeftIcon className="h-6 w-6" />
       </button>
       <button
         onClick={goNext}
         className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-teal-600 text-white p-2 rounded-full hover:bg-teal-700"
-        aria-label="Next slide"
+        aria-label={t('slideshow.next')}
       >
         <ChevronRightIcon className="h-6 w-6" />
       </button>
@@ -193,22 +194,23 @@ const ReasonCard = ({
 
 // Testimonial Component
 const TestimonialCarousel = () => {
+  const { t } = useLanguage();
   const testimonials = [
     {
       name: 'Jane Doe',
-      quote: 'An unforgettable adventure! The guides were amazing, and Virunga was breathtaking.',
+      quote: t('testimonials.jane'),
       rating: 5,
       avatar: 'https://randomuser.me/api/portraits/women/1.jpg',
     },
     {
       name: 'John Smith',
-      quote: 'Lake Kivu was a highlight of my life. Kivu Safaris made it seamless!',
+      quote: t('testimonials.john'),
       rating: 4,
       avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
     },
     {
       name: 'Sarah Lee',
-      quote: 'The cultural tour was so immersive. Highly recommend!',
+      quote: t('testimonials.sarah'),
       rating: 5,
       avatar: 'https://randomuser.me/api/portraits/women/3.jpg',
     },
@@ -235,7 +237,7 @@ const TestimonialCarousel = () => {
           <div className="bg-white p-6 rounded-xl shadow-lg text-center animate-slide-up">
             <img
               src={testimonial.avatar}
-              alt={`${testimonial.name}'s avatar`}
+              alt={t('testimonials.avatarAlt', { name: testimonial.name })}
               className="w-16 h-16 rounded-full mx-auto mb-4"
             />
             <p className="text-gray-600 italic mb-4">"{testimonial.quote}"</p>
@@ -258,6 +260,7 @@ const TestimonialCarousel = () => {
 };
 
 export const Tours = () => {
+  const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLocation, setSelectedLocation] = useState('');
   const [selectedDuration, setSelectedDuration] = useState('');
@@ -274,9 +277,9 @@ export const Tours = () => {
   const durations = [...new Set(tours.map((tour) => tour.duration))];
   const categories = ['Wildlife', 'Cultural', 'Adventure', 'Relaxation'];
   const priceRanges = [
-    { label: 'Under $300', min: 0, max: 300 },
-    { label: '$300 - $500', min: 300, max: 500 },
-    { label: 'Over $500', min: 500, max: Infinity },
+    { label: t('filter.priceUnder300'), min: 0, max: 300 },
+    { label: t('filter.price300to500'), min: 300, max: 500 },
+    { label: t('filter.priceOver500'), min: 500, max: Infinity },
   ];
 
   // Load filters from localStorage
@@ -290,9 +293,9 @@ export const Tours = () => {
       setPriceRange(priceRange || '');
       setSelectedCategory(category || '');
       setSelectedDate(date || '');
-      setToast({ show: true, message: 'Restored your filter settings!', type: 'success' });
+      setToast({ show: true, message: t('filter.restored'), type: 'success' });
     }
-  }, []);
+  }, [t]);
 
   // Save filters to localStorage
   useEffect(() => {
@@ -316,8 +319,8 @@ export const Tours = () => {
   useEffect(() => {
     fetchTours()
       .then((data) => setToursData(data))
-      .catch(() => setToast({ show: true, message: 'Failed to load tours', type: 'error' }));
-  }, []);
+      .catch(() => setToast({ show: true, message: t('filter.loadError'), type: 'error' }));
+  }, [t]);
 
   // Filter and sort tours
   const filteredTours = toursData
@@ -354,7 +357,7 @@ export const Tours = () => {
     setSelectedDate('');
     setSortBy('default');
     setPage(1);
-    setToast({ show: true, message: 'Filters cleared!', type: 'success' });
+    setToast({ show: true, message: t('filter.cleared'), type: 'success' });
     localStorage.removeItem('tourFilters');
   };
 
@@ -364,7 +367,7 @@ export const Tours = () => {
       <Link to="/contact">
         <button
           className="fixed bottom-6 right-6 bg-coral-500 text-white p-4 rounded-full shadow-lg hover:bg-coral-600 transform hover:scale-110 transition-all duration-300 z-50 animate-slide-up"
-          aria-label="Book now"
+          aria-label={t('common.book_now')}
         >
           <SendIcon className="h-6 w-6" />
         </button>
@@ -379,10 +382,10 @@ export const Tours = () => {
           <button
             onClick={() => setIsFilterOpen(!isFilterOpen)}
             className="md:hidden mb-4 bg-teal-600 text-white px-4 py-2 rounded-lg flex items-center"
-            aria-label="Toggle filters"
+            aria-label={t('filter.toggle')}
           >
             <FilterIcon className="h-5 w-5 mr-2" />
-            {isFilterOpen ? 'Hide Filters' : 'Show Filters'}
+            {isFilterOpen ? t('filter.hide') : t('filter.show')}
           </button>
           <div className={`flex flex-col gap-4 ${isFilterOpen ? 'block' : 'hidden md:flex md:flex-row'}`}>
             {/* Search */}
@@ -390,11 +393,11 @@ export const Tours = () => {
               <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search tours (e.g., Virunga, Wildlife)"
+                placeholder={t('search.tours')}
                 className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-teal-500"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                aria-label="Search tours"
+                aria-label={t('search.tours')}
               />
             </div>
             {/* Filters */}
@@ -403,9 +406,9 @@ export const Tours = () => {
                 value={selectedLocation}
                 onChange={(e) => setSelectedLocation(e.target.value)}
                 className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
-                aria-label="Filter by location"
+                aria-label={t('filter.location')}
               >
-                <option value="">All Locations</option>
+                <option value="">{t('filter.allLocations')}</option>
                 {locations.map((location) => (
                   <option key={location} value={location}>
                     {location}
@@ -416,9 +419,9 @@ export const Tours = () => {
                 value={selectedDuration}
                 onChange={(e) => setSelectedDuration(e.target.value)}
                 className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
-                aria-label="Filter by duration"
+                aria-label={t('filter.duration')}
               >
-                <option value="">All Durations</option>
+                <option value="">{t('filter.allDurations')}</option>
                 {durations.map((duration) => (
                   <option key={duration} value={duration}>
                     {duration}
@@ -429,9 +432,9 @@ export const Tours = () => {
                 value={selectedPriceRange}
                 onChange={(e) => setPriceRange(e.target.value)}
                 className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
-                aria-label="Filter by price range"
+                aria-label={t('filter.price')}
               >
-                <option value="">All Prices</option>
+                <option value="">{t('filter.allPrices')}</option>
                 {priceRanges.map((range) => (
                   <option key={range.label} value={range.label}>
                     {range.label}
@@ -442,9 +445,9 @@ export const Tours = () => {
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
                 className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
-                aria-label="Filter by category"
+                aria-label={t('filter.category')}
               >
-                <option value="">All Categories</option>
+                <option value="">{t('filter.allCategories')}</option>
                 {categories.map((category) => (
                   <option key={category} value={category}>
                     {category}
@@ -458,24 +461,24 @@ export const Tours = () => {
                   value={selectedDate}
                   onChange={(e) => setSelectedDate(e.target.value)}
                   className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
-                  aria-label="Filter by date"
+                  aria-label={t('filter.date')}
                 />
               </div>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
                 className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
-                aria-label="Sort tours"
+                aria-label={t('filter.sort')}
               >
-                <option value="default">Sort: Default</option>
-                <option value="price-asc">Price: Low to High</option>
-                <option value="price-desc">Price: High to Low</option>
-                <option value="duration">Duration</option>
-                <option value="rating">Rating</option>
+                <option value="default">{t('filter.sortDefault')}</option>
+                <option value="price-asc">{t('filter.sortPriceAsc')}</option>
+                <option value="price-desc">{t('filter.sortPriceDesc')}</option>
+                <option value="duration">{t('filter.sortDuration')}</option>
+                <option value="rating">{t('filter.sortRating')}</option>
               </select>
               {(searchQuery || selectedLocation || selectedDuration || selectedPriceRange || selectedCategory || selectedDate) && (
                 <Button variant="outline" onClick={clearFilters} className="hover:bg-teal-100">
-                  Clear Filters
+                  {t('filter.clear')}
                 </Button>
               )}
             </div>
@@ -489,12 +492,10 @@ export const Tours = () => {
           {displayedTours.length === 0 ? (
             <div className="text-center py-12 animate-slide-up">
               <FilterIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2">No Tours Found</h3>
-              <p className="text-gray-600 mb-4">
-                No tours match your current filters. Try adjusting your search criteria.
-              </p>
+              <h3 className="text-xl font-semibold mb-2">{t('tours.noResults')}</h3>
+              <p className="text-gray-600 mb-4">{t('tours.noResultsMessage')}</p>
               <Button variant="outline" onClick={clearFilters} className="hover:bg-teal-100">
-                Clear All Filters
+                {t('filter.clear')}
               </Button>
             </div>
           ) : (
@@ -516,7 +517,7 @@ export const Tours = () => {
                           }`}
                         />
                       ))}
-                      <span className="ml-2 text-gray-600">({tour.reviews || 0} reviews)</span>
+                      <span className="ml-2 text-gray-600">({tour.reviews || 0} {t('booking.reviews')})</span>
                     </div>
                   </div>
                 ))}
@@ -526,9 +527,9 @@ export const Tours = () => {
                   <Button
                     onClick={() => setPage(page + 1)}
                     className="bg-teal-600 text-white hover:bg-teal-700"
-                    aria-label="Load more tours"
+                    aria-label={t('tours.loadMore')}
                   >
-                    Load More
+                    {t('tours.loadMore')}
                   </Button>
                 </div>
               )}
@@ -541,24 +542,24 @@ export const Tours = () => {
       <section className="py-16 bg-gradient-to-b from-white to-gray-50">
         <div className="container mx-auto px-4">
           <h2 className="text-4xl font-bold mb-12 text-center text-gray-800 animate-slide-up">
-            Why Choose Kivu Safaris
+            {t('tours.whyChoose')}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {[
               {
                 icon: <UsersIcon className="h-6 w-6" />,
-                title: 'Expert Guides',
-                description: 'Our local guides ensure a safe and immersive experience.',
+                title: t('tours.expertGuides'),
+                description: t('tours.expertGuidesDesc'),
               },
               {
                 icon: <MapPinIcon className="h-6 w-6" />,
-                title: 'Unique Destinations',
-                description: 'Explore exclusive locations like Virunga and Lake Kivu.',
+                title: t('tours.uniqueDestinations'),
+                description: t('tours.uniqueDestinationsDesc'),
               },
               {
                 icon: <StarIcon className="h-6 w-6" />,
-                title: 'Sustainable Tourism',
-                description: 'We prioritize eco-friendly and community-focused travel.',
+                title: t('tours.sustainable'),
+                description: t('tours.sustainableDesc'),
               },
             ].map((reason, index) => (
               <ReasonCard key={reason.title} {...reason} index={index} />
@@ -571,7 +572,7 @@ export const Tours = () => {
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <h2 className="text-4xl font-bold mb-12 text-center text-gray-800 animate-slide-up">
-            What Our Travelers Say
+            {t('tours.testimonials')}
           </h2>
           <TestimonialCarousel />
         </div>
@@ -581,23 +582,23 @@ export const Tours = () => {
       <section className="py-16">
         <div className="container mx-auto px-4">
           <h2 className="text-4xl font-bold mb-12 text-center text-gray-800 animate-slide-up">
-            Popular Destinations
+            {t('tours.popularDestinations')}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {[
               {
                 image: 'https://images.unsplash.com/photo-1516426122075-c23e6d2db1dd?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
-                name: 'Virunga National Park',
+                name: t('destinations.virunga'),
                 link: '/tours?location=Virunga',
               },
               {
                 image: 'https://images.unsplash.com/photo-1519659528534-7fd733a832a0?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
-                name: 'Lake Kivu',
+                name: t('destinations.lakeKivu'),
                 link: '/tours?location=Lake Kivu',
               },
               {
                 image: 'https://images.unsplash.com/photo-1504173010664-32509aeebb62?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
-                name: 'Nyungwe Forest',
+                name: t('destinations.nyungwe'),
                 link: '/tours?location=Nyungwe',
               },
             ].map((dest, index) => (
@@ -622,57 +623,55 @@ export const Tours = () => {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             <div>
-              <h3 className="text-2xl font-bold mb-4">Kivu Safaris</h3>
-              <p className="text-gray-300">
-                Explore the heart of Africa with our expert-guided tours. Your adventure starts here.
-              </p>
+              <h3 className="text-2xl font-bold mb-4">{t('footer.logoAlt')}</h3>
+              <p className="text-gray-300">{t('footer.tagline')}</p>
             </div>
             <div>
-              <h3 className="text-2xl font-bold mb-4">Quick Links</h3>
+              <h3 className="text-2xl font-bold mb-4">{t('footer.quickLinks')}</h3>
               <ul className="space-y-2">
                 <li>
                   <Link to="/" className="text-gray-300 hover:text-white transition-colors">
-                    Home
+                    {t('footer.links.home')}
                   </Link>
                 </li>
                 <li>
                   <Link to="/tours" className="text-gray-300 hover:text-white transition-colors">
-                    Tours
+                    {t('footer.links.tours')}
                   </Link>
                 </li>
                 <li>
                   <Link to="/about" className="text-gray-300 hover:text-white transition-colors">
-                    About Us
+                    {t('footer.links.about')}
                   </Link>
                 </li>
                 <li>
                   <Link to="/contact" className="text-gray-300 hover:text-white transition-colors">
-                    Contact
+                    {t('footer.links.contact')}
                   </Link>
                 </li>
               </ul>
             </div>
             <div>
-              <h3 className="text-2xl font-bold mb-4">Stay Connected</h3>
+              <h3 className="text-2xl font-bold mb-4">{t('footer.contact')}</h3>
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
-                  setToast({ show: true, message: 'Subscribed to newsletter!', type: 'success' });
+                  setToast({ show: true, message: t('footer.newsletter.success'), type: 'success' });
                 }}
                 className="flex"
               >
                 <input
                   type="email"
-                  placeholder="Enter your email"
+                  placeholder={t('footer.newsletter.placeholder')}
                   className="flex-1 p-3 rounded-l-lg border-none focus:outline-none focus:ring-2 focus:ring-coral-500 text-gray-800"
-                  aria-label="Newsletter email"
+                  aria-label={t('footer.newsletter.placeholder')}
                 />
                 <Button
                   type="submit"
                   className="bg-coral-500 text-white hover:bg-coral-600 rounded-l-none"
-                  aria-label="Subscribe to newsletter"
+                  aria-label={t('footer.newsletter.submit')}
                 >
-                  Subscribe
+                  {t('footer.newsletter.submit')}
                 </Button>
               </form>
               <div className="mt-4 flex space-x-4">
@@ -680,17 +679,17 @@ export const Tours = () => {
                   {
                     href: 'https://instagram.com/kivusafaris',
                     icon: <InstagramIcon className="h-5 w-5" />,
-                    label: 'Instagram',
+                    label: t('footer.social', { platform: 'Instagram' }),
                   },
                   {
                     href: 'https://twitter.com/kivusafaris',
                     icon: <TwitterIcon className="h-5 w-5" />,
-                    label: 'Twitter',
+                    label: t('footer.social', { platform: 'Twitter' }),
                   },
                   {
                     href: 'https://facebook.com/kivusafaris',
                     icon: <FacebookIcon className="h-5 w-5" />,
-                    label: 'Facebook',
+                    label: t('footer.social', { platform: 'Facebook' }),
                   },
                 ].map((social) => (
                   <a
@@ -707,7 +706,7 @@ export const Tours = () => {
               </div>
             </div>
           </div>
-          <p className="text-center text-gray-400 mt-12">© 2025 Kivu Safaris. All rights reserved.</p>
+          <p className="text-center text-gray-400 mt-12">{t('footer.copyright', { year: '2025' })}</p>
         </div>
       </footer>
 

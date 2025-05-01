@@ -1,7 +1,5 @@
-
-import React, { useState, useEffect, createContext, useContext, startTransition } from 'react';
+import { createContext, useState, useEffect, useContext, startTransition } from 'react';
 import { GlobeIcon } from 'lucide-react';
-import { Button } from '../components/common/Button';
 
 type Language = 'en' | 'fr' | 'rw';
 
@@ -11,11 +9,10 @@ interface LanguageContextType {
   t: (key: string, params?: Record<string, string>) => string;
 }
 
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+export const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export const translations: Record<Language, Record<string, string>> = {
   en: {
-    // Existing translations
     'home.hero.title': 'Discover the Beauty of Kivu',
     'home.hero.subtitle': "Experience unforgettable adventures in Africa's most breathtaking landscapes",
     'common.book_now': 'Book Now',
@@ -58,7 +55,6 @@ export const translations: Record<Language, Record<string, string>> = {
     'booking.reviews': 'reviews',
     'language.changed': 'Language changed to {language}',
     'language.switcher': 'Change Language',
-    // New footer translations
     'footer.logoAlt': 'Kivu Safaris Logo',
     'footer.tagline': 'Explore. Experience. Connect.',
     'footer.quickLinks': 'Quick Links',
@@ -83,9 +79,23 @@ export const translations: Record<Language, Record<string, string>> = {
     'footer.newsletter.success': 'Subscribed successfully!',
     'footer.newsletter.error': 'Failed to subscribe. Please try again.',
     'footer.copyright': '© {year} Kivu Safaris. All rights reserved. Officially registered with tourism authorities in the Democratic Republic of Congo.',
+    'filter.toggle': 'Toggle Filters',
+    'filter.show': 'Show Filters',
+    'filter.hide': 'Hide Filters',
+    'search.tours': 'Search tours (e.g., Virunga, Wildlife)',
+    'filter.allLocations': 'All Locations',
+    'filter.allDurations': 'All Durations',
+    'filter.allPrices': 'All Prices',
+    'filter.allCategories': 'All Categories',
+    'filter.location': 'Filter by location',
+    'filter.duration': 'Filter by duration',
+    'filter.price': 'Filter by price range',
+    'filter.category': 'Filter by category',
+    'filter.date': 'Filter by date',
+    'filter.sort': 'Sort tours',
+    'filter.clear': 'Clear Filters',
   },
   fr: {
-    // Existing translations
     'home.hero.title': 'Découvrez la Beauté du Kivu',
     'home.hero.subtitle': "Vivez des aventures inoubliables dans les paysages les plus époustouflants d'Afrique",
     'common.book_now': 'Réserver',
@@ -128,7 +138,6 @@ export const translations: Record<Language, Record<string, string>> = {
     'booking.reviews': 'avis',
     'language.changed': 'Langue changée en {language}',
     'language.switcher': 'Changer de Langue',
-    // New footer translations
     'footer.logoAlt': 'Logo de Kivu Safaris',
     'footer.tagline': 'Explorer. Vivre. Connecter.',
     'footer.quickLinks': 'Liens Rapides',
@@ -153,9 +162,23 @@ export const translations: Record<Language, Record<string, string>> = {
     'footer.newsletter.success': 'Abonnement réussi !',
     'footer.newsletter.error': 'Échec de l’abonnement. Veuillez réessayer.',
     'footer.copyright': '© {year} Kivu Safaris. Tous droits réservés. Enregistré officiellement auprès des autorités touristiques de la République Démocratique du Congo.',
+    'filter.toggle': 'Basculer les filtres',
+    'filter.show': 'Afficher les filtres',
+    'filter.hide': 'Masquer les filtres',
+    'search.tours': 'Rechercher des circuits (par ex., Virunga, Faune)',
+    'filter.allLocations': 'Tous les emplacements',
+    'filter.allDurations': 'Toutes les durées',
+    'filter.allPrices': 'Tous les prix',
+    'filter.allCategories': 'Toutes les catégories',
+    'filter.location': 'Filtrer par emplacement',
+    'filter.duration': 'Filtrer par durée',
+    'filter.price': 'Filtrer par gamme de prix',
+    'filter.category': 'Filtrer par catégorie',
+    'filter.date': 'Filtrer par date',
+    'filter.sort': 'Trier les circuits',
+    'filter.clear': 'Effacer les filtres',
   },
   rw: {
-    // Existing translations
     'home.hero.title': 'Tangira Ubwiza bwa Kivu',
     'home.hero.subtitle': 'Bona uburambe butazibagirana mu maso meza ya Afrika',
     'common.book_now': 'Kwandikisha',
@@ -184,7 +207,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'booking.specialRequestsPlaceholder': 'Icyifuzo cyose cyangwa icyo usaba by’umwihariko...',
     'booking.priceSummary': 'Incamake y’Igiciro',
     'booking.tourPrice': 'Igiciro cy’Urugendo',
-    'booking.discount': 'Kugabalinksnywa',
+    'booking.discount': 'Kugabanya',
     'booking.tax': 'Umusoro',
     'booking.total': 'Igiteranyo',
     'booking.depositRequired': '50% yo kwishyura mbere irasabwa',
@@ -198,7 +221,6 @@ export const translations: Record<Language, Record<string, string>> = {
     'booking.reviews': 'ibitekerezo',
     'language.changed': 'Ururimi rwahinduwe rube {language}',
     'language.switcher': 'Hindura Ururimi',
-    // New footer translations
     'footer.logoAlt': 'Ikirango cya Kivu Safaris',
     'footer.tagline': 'Shaka. Menya. Huza.',
     'footer.quickLinks': 'Amahuza Yihuse',
@@ -223,6 +245,21 @@ export const translations: Record<Language, Record<string, string>> = {
     'footer.newsletter.success': 'Wiyandikishije neza!',
     'footer.newsletter.error': 'Kwiyandikisha byanze. Ongera ugerageze.',
     'footer.copyright': '© {year} Kivu Safaris. Ubushobozi bwose burabitswe. Byanditswe byemewe n’ubuyobozi bw’ubukerarugendo muri Repubulika Iharanira Demokarasi ya Kongo.',
+    'filter.toggle': 'Guhindura Amabwiriza',
+    'filter.show': 'Erekana Amabwiriza',
+    'filter.hide': 'Hisha Amabwiriza',
+    'search.tours': 'Shakisha urugendo (urugero, Virunga, Ubuzima bwa kera)',
+    'filter.allLocations': 'Aho hose',
+    'filter.allDurations': 'Igihe cyose',
+    'filter.allPrices': 'Ibiciro byose',
+    'filter.allCategories': 'Ibyiciro byose',
+    'filter.location': 'Hitamo ahantu',
+    'filter.duration': 'Hitamo igihe',
+    'filter.price': 'Hitamo ibiciro',
+    'filter.category': 'Hitamo icyiciro',
+    'filter.date': 'Hitamo itariki',
+    'filter.sort': 'Toranya urugendo',
+    'filter.clear': 'Siba Amabwiriza Yose',
   },
 };
 
@@ -310,7 +347,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [language, setLanguageState] = useState<Language>(() => {
     try {
       const saved = localStorage.getItem('language');
-      return (saved as Language) || 'en';
+      return saved && ['en', 'fr', 'rw'].includes(saved) ? (saved as Language) : 'en';
     } catch {
       return 'en';
     }
@@ -340,7 +377,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   // Translation function with parameter support
   const t = (key: string, params: Record<string, string> = {}): string => {
-    let translation = translations[language]?.[key] || translations.en[key] || key;
+    let translation = translations[language]?.[key] ?? translations.en[key] ?? key;
     Object.entries(params).forEach(([param, value]) => {
       translation = translation.replace(`{${param}}`, value);
     });
