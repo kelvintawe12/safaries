@@ -265,9 +265,9 @@ export const BookingForm = ({ tours, onSubmit }: BookingFormProps) => {
                     disabled={!selectedTour}
                   >
                     <option value="">{t('booking.selectDatePlaceholder')}</option>
-                    {selectedTour?.availableDates.map((date) => (
+                    {selectedTour?.availableDates.map((date: string) => (
                       <option key={date} value={date}>
-                        {new Date(date).toLocaleDateString(language)}
+                      {new Date(date).toLocaleDateString(language)}
                       </option>
                     ))}
                   </select>

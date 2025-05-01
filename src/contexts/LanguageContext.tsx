@@ -15,6 +15,7 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 export const translations: Record<Language, Record<string, string>> = {
   en: {
+    // Existing translations
     'home.hero.title': 'Discover the Beauty of Kivu',
     'home.hero.subtitle': "Experience unforgettable adventures in Africa's most breathtaking landscapes",
     'common.book_now': 'Book Now',
@@ -57,8 +58,34 @@ export const translations: Record<Language, Record<string, string>> = {
     'booking.reviews': 'reviews',
     'language.changed': 'Language changed to {language}',
     'language.switcher': 'Change Language',
+    // New footer translations
+    'footer.logoAlt': 'Kivu Safaris Logo',
+    'footer.tagline': 'Explore. Experience. Connect.',
+    'footer.quickLinks': 'Quick Links',
+    'footer.links.home': 'Home',
+    'footer.links.about': 'About Us',
+    'footer.links.tours': 'Tours',
+    'footer.links.contact': 'Contact',
+    'footer.legal': 'Legal',
+    'footer.legalLinks.privacy': 'Privacy Policy',
+    'footer.legalLinks.faq': 'FAQ',
+    'footer.legalLinks.terms': 'Terms of Service',
+    'footer.contact': 'Contact Us',
+    'footer.address': '123 Main Street, Goma, North Kivu, DRC',
+    'footer.phone': 'Call us at +243 123 456 789',
+    'footer.email': 'Email us at info@kivusafaris.com',
+    'footer.social': 'Follow us on {platform}',
+    'footer.newsletter.title': 'Stay Updated',
+    'footer.newsletter.description': 'Subscribe to our newsletter for exclusive offers and updates.',
+    'footer.newsletter.placeholder': 'Enter your email',
+    'footer.newsletter.submit': 'Subscribe',
+    'footer.newsletter.submitting': 'Subscribing...',
+    'footer.newsletter.success': 'Subscribed successfully!',
+    'footer.newsletter.error': 'Failed to subscribe. Please try again.',
+    'footer.copyright': '© {year} Kivu Safaris. All rights reserved. Officially registered with tourism authorities in the Democratic Republic of Congo.',
   },
   fr: {
+    // Existing translations
     'home.hero.title': 'Découvrez la Beauté du Kivu',
     'home.hero.subtitle': "Vivez des aventures inoubliables dans les paysages les plus époustouflants d'Afrique",
     'common.book_now': 'Réserver',
@@ -101,8 +128,34 @@ export const translations: Record<Language, Record<string, string>> = {
     'booking.reviews': 'avis',
     'language.changed': 'Langue changée en {language}',
     'language.switcher': 'Changer de Langue',
+    // New footer translations
+    'footer.logoAlt': 'Logo de Kivu Safaris',
+    'footer.tagline': 'Explorer. Vivre. Connecter.',
+    'footer.quickLinks': 'Liens Rapides',
+    'footer.links.home': 'Accueil',
+    'footer.links.about': 'À Propos',
+    'footer.links.tours': 'Tours',
+    'footer.links.contact': 'Contact',
+    'footer.legal': 'Légal',
+    'footer.legalLinks.privacy': 'Politique de Confidentialité',
+    'footer.legalLinks.faq': 'FAQ',
+    'footer.legalLinks.terms': 'Conditions de Service',
+    'footer.contact': 'Nous Contacter',
+    'footer.address': '123 Rue Principale, Goma, Nord-Kivu, RDC',
+    'footer.phone': 'Appelez-nous au +243 123 456 789',
+    'footer.email': 'Envoyez-nous un email à info@kivusafaris.com',
+    'footer.social': 'Suivez-nous sur {platform}',
+    'footer.newsletter.title': 'Restez Informé',
+    'footer.newsletter.description': 'Abonnez-vous à notre newsletter pour des offres exclusives et des mises à jour.',
+    'footer.newsletter.placeholder': 'Entrez votre email',
+    'footer.newsletter.submit': 'S’abonner',
+    'footer.newsletter.submitting': 'Abonnement en cours...',
+    'footer.newsletter.success': 'Abonnement réussi !',
+    'footer.newsletter.error': 'Échec de l’abonnement. Veuillez réessayer.',
+    'footer.copyright': '© {year} Kivu Safaris. Tous droits réservés. Enregistré officiellement auprès des autorités touristiques de la République Démocratique du Congo.',
   },
   rw: {
+    // Existing translations
     'home.hero.title': 'Tangira Ubwiza bwa Kivu',
     'home.hero.subtitle': 'Bona uburambe butazibagirana mu maso meza ya Afrika',
     'common.book_now': 'Kwandikisha',
@@ -131,7 +184,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'booking.specialRequestsPlaceholder': 'Icyifuzo cyose cyangwa icyo usaba by’umwihariko...',
     'booking.priceSummary': 'Incamake y’Igiciro',
     'booking.tourPrice': 'Igiciro cy’Urugendo',
-    'booking.discount': 'Kugabanywa',
+    'booking.discount': 'Kugabalinksnywa',
     'booking.tax': 'Umusoro',
     'booking.total': 'Igiteranyo',
     'booking.depositRequired': '50% yo kwishyura mbere irasabwa',
@@ -145,6 +198,31 @@ export const translations: Record<Language, Record<string, string>> = {
     'booking.reviews': 'ibitekerezo',
     'language.changed': 'Ururimi rwahinduwe rube {language}',
     'language.switcher': 'Hindura Ururimi',
+    // New footer translations
+    'footer.logoAlt': 'Ikirango cya Kivu Safaris',
+    'footer.tagline': 'Shaka. Menya. Huza.',
+    'footer.quickLinks': 'Amahuza Yihuse',
+    'footer.links.home': 'Ahabanza',
+    'footer.links.about': 'Ibyacu',
+    'footer.links.tours': 'Urugendo',
+    'footer.links.contact': 'Twandikire',
+    'footer.legal': 'Byemewe',
+    'footer.legalLinks.privacy': 'Politiki y’Ubutekanishi',
+    'footer.legalLinks.faq': 'Ibibazo Bikunze Kubazwa',
+    'footer.legalLinks.terms': 'Amategeko y’Imikoreshereze',
+    'footer.contact': 'Twandikire',
+    'footer.address': '123 Umuhanda Mukuru, Goma, Kivu y’Amajyaruguru, RDC',
+    'footer.phone': 'Duhamagare kuri +243 123 456 789',
+    'footer.email': 'Twandikire kuri info@kivusafaris.com',
+    'footer.social': 'Dukurikire kuri {platform}',
+    'footer.newsletter.title': 'Komeza Umenye',
+    'footer.newsletter.description': 'Iyandikishe kuri newsletter yacu kugirango ubone amahitamo yihariye n’ibimenyetso.',
+    'footer.newsletter.placeholder': 'Injiza imeyili yawe',
+    'footer.newsletter.submit': 'Iyandikishe',
+    'footer.newsletter.submitting': 'Birimo kwiyandikisha...',
+    'footer.newsletter.success': 'Wiyandikishije neza!',
+    'footer.newsletter.error': 'Kwiyandikisha byanze. Ongera ugerageze.',
+    'footer.copyright': '© {year} Kivu Safaris. Ubushobozi bwose burabitswe. Byanditswe byemewe n’ubuyobozi bw’ubukerarugendo muri Repubulika Iharanira Demokarasi ya Kongo.',
   },
 };
 
@@ -262,7 +340,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   // Translation function with parameter support
   const t = (key: string, params: Record<string, string> = {}): string => {
-    let translation = translations[language][key] || translations.en[key] || key;
+    let translation = translations[language]?.[key] || translations.en[key] || key;
     Object.entries(params).forEach(([param, value]) => {
       translation = translation.replace(`{${param}}`, value);
     });

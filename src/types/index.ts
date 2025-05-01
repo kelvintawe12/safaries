@@ -1,3 +1,37 @@
+export interface Tour {
+  id: number;
+  title: {
+    en: string;
+    fr: string;
+    rw: string;
+  };
+  description: {
+    en: string;
+    fr: string;
+    rw: string;
+  };
+  price: number;
+  currency: string;
+  image: string;
+  images: string[];
+  durationDays: number;
+  duration: string;
+  category: string;
+  difficulty: string;
+  featured: boolean;
+  tags: string[];
+  promocode?: string;
+  reviews: any[];
+  rating: number;
+  minParticipants: number;
+  location: string;
+  highlights: string[];
+  availableDates: string[]; // ISO dates
+  maxParticipants: number;
+  createdAt: string; // ISO date
+  updatedAt: string; // ISO date
+}
+
 // Add new TourDetails interface and update Booking interface to use it
 
 export interface TourDetails {

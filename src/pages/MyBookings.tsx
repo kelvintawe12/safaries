@@ -6,7 +6,7 @@ import { LoadingState } from '../components/common/LoadingState';
 import { generateReceipt } from '../utils/receipt';
 import { DownloadIcon, FileTextIcon, XCircleIcon, EyeIcon } from 'lucide-react';
 import { FloatingButton } from '../components/common/FloatingButton';
-import type { Booking, Receipt, ClientDetails, TourDetails } from '../types';
+import type { Booking, Receipt, TourDetails } from '../types';
 
 // Simulated API for bookings
 const fetchBookings = async (userId: string): Promise<Booking[]> => {
@@ -205,9 +205,19 @@ const MyBookings = () => {
           date: booking.tourDate,
           participants: booking.participants,
           price: booking.totalPrice,
-          specialRequests: booking.specialRequests,
+          image: booking.tourDetails?.image || '',
+        },
+        paymentDetails: {
+          total: booking.totalPrice,
+          deposit: booking.depositAmount || 0,
+          balance: booking.totalPrice - (booking.depositAmount || 0),
+          currency: 'USD',
+          method: booking.paymentMethod || 'credit_card',
+          transactionId: '', // No transactionId available in booking, left empty
+          paidAt: booking.updatedAt || booking.createdAt,
         },
         createdAt: booking.createdAt,
+        updatedAt: booking.updatedAt || booking.createdAt,
       };
       const pdfBlob = await generateReceipt(receipt);
       const url = URL.createObjectURL(pdfBlob);
