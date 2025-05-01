@@ -199,7 +199,9 @@ const MyBookings = () => {
         ).toLocaleString('en-US', { weekday: 'short' })}`,
         clientDetails: booking.clientDetails,
         tourDetails: {
-          title: booking.tourTitle || booking.tourDetails?.title || 'Unknown Tour',
+          title: typeof booking.tourTitle === 'string'
+            ? { en: booking.tourTitle, fr: booking.tourTitle, rw: booking.tourTitle }
+            : booking.tourDetails?.title || { en: 'Unknown Tour', fr: 'Unknown Tour', rw: 'Unknown Tour' },
           date: booking.tourDate,
           participants: booking.participants,
           price: booking.totalPrice,
