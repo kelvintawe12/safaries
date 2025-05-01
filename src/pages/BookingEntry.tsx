@@ -1,10 +1,9 @@
-
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { tours } from '../data/tours';
 import { generateReceipt } from '../utils/receipt';
 import { LoadingState } from '../components/common/LoadingState';
-import { LanguageContext } from '../contexts/LanguageContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import { Tour, Booking, Receipt, ClientDetails, TourDetails } from '../types';
 
 const sendEmailInvitation = async (data: {
@@ -102,7 +101,7 @@ const RegisterForm = ({ onProceed, onRegister }: { onProceed: () => void; onRegi
 };
 
 const TourSlideshow = () => {
-  const { language } = useContext(LanguageContext);
+  const { language } = useLanguage();
   const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
@@ -155,7 +154,7 @@ const TourSlideshow = () => {
 };
 
 const Testimonials = () => {
-  const { language } = useContext(LanguageContext);
+  const { language } = useLanguage();
   const testimonials = [
     {
       name: 'Sarah M.',
@@ -221,7 +220,7 @@ const TourCard = ({
   onSelect: (id: number) => void;
   clientDetails: ClientDetails | null;
 }) => {
-  const { language } = useContext(LanguageContext);
+  const { language } = useLanguage();
   const [isExpanded, setIsExpanded] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(Math.floor(Math.random() * 100));
@@ -536,7 +535,7 @@ const BookingForm = ({
   onSubmit: (data: BookingFormData) => void;
   initialData?: Partial<Booking>;
 }) => {
-  const { language } = useContext(LanguageContext);
+  const { language } = useLanguage();
   const [formData, setFormData] = useState<BookingFormData>({
     tourDate: initialData?.tourDate || '',
     participants: initialData?.participants || 1,
@@ -718,7 +717,7 @@ const ErrorToast = ({ message, onClose }: { message: string; onClose: () => void
 };
 
 const BookingEntry = () => {
-  const { language } = useContext(LanguageContext);
+  const { language } = useLanguage();
   const [step, setStep] = useState<'register' | 'select-tour' | 'book' | 'confirmed'>('register');
   const [selectedTourId, setSelectedTourId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
