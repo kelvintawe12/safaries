@@ -25,9 +25,9 @@ interface Tour {
   price: number;
   images: string[];
   duration: string;
-  highlights: string[];
+  included: string[];
   itinerary: { day: number; description: string }[];
-  inclusions: string[];
+  notIncluded: string[];
   location: string;
   featured?: boolean;
 }
@@ -111,7 +111,7 @@ const generateEmailTemplate = (senderName: string, tour: Tour): string => `
         <p><strong>Price:</strong> $${tour.price} USD</p>
         <p><strong>Highlights:</strong></p>
         <ul>
-          ${tour.highlights.map((highlight) => `<li>${highlight}</li>`).join('')}
+          ${tour.included.map((highlight) => `<li>${highlight}</li>`).join('')}
         </ul>
       </div>
       <div class="cta">
@@ -584,14 +584,14 @@ const TourCard = ({
           <div>
             <h4 className="text-lg font-semibold text-gray-800">Highlights</h4>
             <ul className="list-disc pl-5 text-gray-600">
-              {tour.highlights.map((highlight, index) => (
+              {(tour.included || []).map((highlight, index) => (
                 <li key={index}>{highlight}</li>
               ))}
             </ul>
           </div>
           <div>
             <h4 className="text-lg font-semibold text-gray-800">Itinerary</h4>
-            {tour.itinerary.map((item) => (
+            {(tour.itinerary || []).map((item) => (
               <div key={item.day} className="mt-2">
                 <p className="font-medium text-gray-800">Day {item.day}</p>
                 <p className="text-gray-600">{item.description}</p>
@@ -601,9 +601,9 @@ const TourCard = ({
           <div>
             <h4 className="text-lg font-semibold text-gray-800">Inclusions</h4>
             <ul className="list-disc pl-5 text-gray-600">
-              {tour.inclusions.map((inclusion, index) => (
-                <li key={index}>{inclusion}</li>
-              ))}
+            {(tour.notIncluded || []).map((inclusion, index) => (
+              <li key={index}>{inclusion}</li>
+            ))}
             </ul>
           </div>
         </div>
@@ -979,7 +979,7 @@ const BookingEntry = () => {
           <BookingForm
             tour={tour}
             onSubmit={bookingDetails ? handleBookingUpdate : handleBookingSubmit}
-            initialData={bookingDetails}
+            initialData={bookingDetails || undefined}
           />
         </div>
         {error && <ErrorToast message={error} onClose={() => setError(null)} />}
