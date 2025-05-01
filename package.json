@@ -13,6 +13,8 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",
+    "cache": "^3.0.0",
+    "clear": "^0.1.0",
     "framer-motion": "^10.12.16",
     "jspdf": "^3.0.1",
     "lucide-react": "^0.441.0",

@@ -111,7 +111,7 @@ const Slideshow = () => {
             className={`w-3 h-3 rounded-full ${
               index === currentSlide ? 'bg-coral-500' : 'bg-gray-300'
             }`}
-            aria-label={t('slideshow.goToSlide', { number: index + 1 })}
+            aria-label={t('slideshow.goToSlide', { number: String(index + 1) })}
           ></button>
         ))}
       </div>
