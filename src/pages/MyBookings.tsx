@@ -79,7 +79,7 @@ const BookingDetailsModal = ({
         </h2>
         <div className="space-y-4 text-gray-600">
           <p>
-            <strong>Tour:</strong> {tour.title}
+            <strong>Tour:</strong> {typeof tour.title === 'string' ? tour.title : tour.title.en}
           </p>
           <p>
             <strong>Date:</strong> {new Date(booking.tourDate).toLocaleDateString()}
@@ -92,7 +92,7 @@ const BookingDetailsModal = ({
           </p>
           <p>
             <strong>Payment Method:</strong>{' '}
-            {booking.paymentMethod.replace('_', ' ').toUpperCase()}
+            {(booking.paymentMethod ?? 'unknown').replace('_', ' ').toUpperCase()}
           </p>
           <p>
             <strong>Deposit Paid:</strong> {booking.depositPaid ? 'Yes' : 'No'}
@@ -142,7 +142,7 @@ const BookingDetailsModal = ({
           {booking.status !== 'cancelled' && (
             <Button
               onClick={() => onCancel(booking.id)}
-              variant="destructive"
+              variant="primary"
               className="flex-1"
               aria-label="Cancel booking"
             >
@@ -252,7 +252,9 @@ const MyBookings = () => {
     } else {
       const titleA = a.tourTitle || a.tourDetails?.title || '';
       const titleB = b.tourTitle || b.tourDetails?.title || '';
-      return sortOrder === 'asc' ? titleA.localeCompare(titleB) : titleB.localeCompare(titleA);
+      const titleAString = typeof titleA === 'string' ? titleA : titleA.en;
+      const titleBString = typeof titleB === 'string' ? titleB : titleB.en;
+      return sortOrder === 'asc' ? titleAString.localeCompare(titleBString) : titleBString.localeCompare(titleAString);
     }
   });
 
@@ -376,7 +378,9 @@ const MyBookings = () => {
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                       <div>
                         <h3 className="text-xl font-semibold mb-2">
-                          {booking.tourTitle || booking.tourDetails?.title || 'Unknown Tour'}
+                          {typeof booking.tourDetails?.title === 'string'
+                            ? booking.tourDetails.title
+                            : booking.tourDetails?.title?.en || booking.tourTitle || 'Unknown Tour'}
                         </h3>
                         <div className="space-y-1 text-gray-600">
                           <p>

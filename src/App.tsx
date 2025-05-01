@@ -20,14 +20,14 @@ import  BookingEntry  from './pages/BookingEntry';
 
 export function App() {
   return <LanguageProvider>
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
         <div className="flex flex-col min-h-screen bg-white">
           <Header />
           <main className="flex-grow">
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/booking-entry" element={<BookingEntry />} />
-              <Route path="/booking-form" element={<BookingForm tours={[]} onSubmit={async () => Promise.resolve()} />} />
+              <Route path="/booking" element={<BookingForm tours={[]} onSubmit={async () => Promise.resolve()} />} />
               <Route path="/register" element={<RegisterForm/>} />
               <Route path="/about" element={<About />} />
               <Route path="/tours" element={<Tours />} />
