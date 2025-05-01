@@ -359,7 +359,7 @@ export const Tours = () => {
   };
 
   return (
-    <div className="bg-gray-100 min-h-screen relative">
+    <div className="bg-gray-100 min-h-screen relative overflow-x-hidden">
       {/* Sticky Book Now Button */}
       <Link to="/contact">
         <button

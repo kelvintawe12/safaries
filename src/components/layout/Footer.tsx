@@ -3,12 +3,26 @@ import { Link } from 'react-router-dom';
 import { PhoneIcon, MailIcon, MapPinIcon, FacebookIcon, InstagramIcon, TwitterIcon } from 'lucide-react';
 export const Footer = () => {
   const currentYear = new Date().getFullYear();
-  return <footer className="bg-gray-900 text-white">
-      <div className="container mx-auto px-4 py-12">
+  return (
+    <footer className="relative text-white">
+      {/* Background image */}
+      <div
+        className="absolute inset-0 bg-cover bg-center opacity-60"
+        style={{ backgroundImage: "url('/kivu.jpg')" }}
+        aria-hidden="true"
+      />
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-black opacity-60" aria-hidden="true" />
+      {/* Footer content */}
+      <div className="relative container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Company Info */}
           <div>
-            <img src="https://placehold.co/200x60?text=Kivu+Safaris&bg=2D7A73&fg=ffffff" alt="Kivu Safaris Logo" className="h-10 mb-4" />
+            <img
+              src="https://placehold.co/200x60?text=Kivu+Safaris&bg=2D7A73&fg=ffffff"
+              alt="Kivu Safaris Logo"
+              className="h-10 mb-4"
+            />
             <p className="text-gray-300 mb-4">Explore. Experience. Connect.</p>
             <div className="flex space-x-3">
               <a href="https://facebook.com" className="text-gray-300 hover:text-white">
@@ -102,5 +116,6 @@ export const Footer = () => {
           </p>
         </div>
       </div>
-    </footer>;
+    </footer>
+  );
 };

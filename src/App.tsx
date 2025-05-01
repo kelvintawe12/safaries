@@ -11,7 +11,7 @@ import { Privacy } from './pages/Privacy';
 import { Contact } from './pages/Contact';
 import { NotFound } from './pages/NotFound';
 import { LanguageProvider } from './contexts/LanguageContext';
-import { FloatingButtons } from './components/common/FloatingButtons';
+import  FloatingButtons  from './components/common/FloatingButtons';
 import { Rules } from './pages/Rules';
 import  MyBookings  from './pages/MyBookings';
 import RegisterForm from './components/forms/RegisterForm'
@@ -21,7 +21,7 @@ import  BookingEntry  from './pages/BookingEntry';
 export function App() {
   return <LanguageProvider>
       <BrowserRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
-        <div className="flex flex-col min-h-screen bg-white">
+        <div className="flex flex-col min-h-screen bg-white overflow-x-hidden max-w-full">
           <Header />
           <main className="flex-grow">
             <Routes>

@@ -1,53 +1,66 @@
 import React, { useState } from 'react';
-import { MessageCircleIcon, HelpCircleIcon, LifeBuoyIcon, XIcon, PlusIcon } from 'lucide-react';
-import { useLanguage } from '../../contexts/LanguageContext';
+import { HelpCircleIcon, MessageCircleIcon, LifeBuoyIcon, PlusIcon } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import Assistant from './Assistant';
 
-export const FloatingButtons = () => {
+const FloatingButtons: React.FC = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const {
-    t
-  } = useLanguage();
+  const [language, setLanguage] = useState<'en' | 'fr' | 'rw'>('en');
   const location = useLocation();
   const navigate = useNavigate();
 
+  // Navigation handler for adding a booking
   const handleMyBookingsClick = () => {
     navigate('/tours');
   };
 
-  return <div className="fixed bottom-8 right-8 z-50">
-      <div className="flex flex-col items-end space-y-4">
-        {/* Chat Window */}
-        {isChatOpen && <div className="bg-white rounded-lg shadow-xl p-4 mb-4 w-80">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="font-semibold">Safari Assistant</h3>
-              <button onClick={() => setIsChatOpen(false)} className="text-gray-500 hover:text-gray-700">
-                <XIcon className="h-5 w-5" />
-              </button>
-            </div>
-            <div className="h-64 overflow-y-auto border rounded-lg p-4 mb-4">
-              {/* Chat messages would go here */}
-              <p className="text-gray-600">
-                How can I help you plan your safari?
-              </p>
-            </div>
-            <input type="text" placeholder="Type your message..." className="w-full p-2 border rounded-md" />
-          </div>}
+  return (
+    <div className="fixed bottom-4 right-4 z-50 sm:bottom-8 sm:right-8">
+      <div className="flex flex-col items-end space-y-3 sm:space-y-4">
+        {/* Assistant Component */}
+        <Assistant
+          isOpen={isChatOpen}
+          setIsOpen={setIsChatOpen}
+          language={language}
+          setLanguage={setLanguage}
+        />
+
         {/* Floating Buttons */}
-        <div className="flex flex-col space-y-4">
-          <button onClick={() => window.location.href = '/faq'} className="bg-coral-500 text-white p-3 rounded-full shadow-lg hover:bg-coral-600 transition-colors" aria-label="FAQ">
-            <HelpCircleIcon className="h-6 w-6" />
+        <div className="flex flex-col space-y-3 sm:space-y-4">
+          <button
+            onClick={() => (window.location.href = '/faq')}
+            className="bg-orange-500 text-white p-2 sm:p-3 rounded-full shadow-lg hover:bg-orange-600 transition-colors"
+            aria-label="Frequently Asked Questions"
+          >
+            <HelpCircleIcon className="h-5 w-5 sm:h-6 sm:w-6" />
           </button>
-          <button onClick={() => setIsChatOpen(!isChatOpen)} className="bg-teal-700 text-white p-3 rounded-full shadow-lg hover:bg-teal-800 transition-colors" aria-label="Chat">
-            <MessageCircleIcon className="h-6 w-6" />
+          <button
+            onClick={() => setIsChatOpen(!isChatOpen)}
+            className="bg-teal-700 text-white p-2 sm:p-3 rounded-full shadow-lg hover:bg-teal-800 transition-colors"
+            aria-label={isChatOpen ? 'Close chat' : 'Open chat'}
+          >
+            <MessageCircleIcon className="h-5 w-5 sm:h-6 sm:w-6" />
           </button>
-          <button onClick={() => window.location.href = '/contact'} className="bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-colors" aria-label="Support">
-            <LifeBuoyIcon className="h-6 w-6" />
+          <button
+            onClick={() => (window.location.href = '/contact')}
+            className="bg-blue-600 text-white p-2 sm:p-3 rounded-full shadow-lg hover:bg-blue-700 transition-colors"
+            aria-label="Contact support"
+          >
+            <LifeBuoyIcon className="h-5 w-5 sm:h-6 sm:w-6" />
           </button>
-          {location.pathname === '/my-bookings' && <button onClick={handleMyBookingsClick} className="bg-green-600 text-white p-3 rounded-full shadow-lg hover:bg-green-700 transition-colors" aria-label="Add Booking">
-            <PlusIcon className="h-6 w-6" />
-          </button>}
+          {location.pathname === '/my-bookings' && (
+            <button
+              onClick={handleMyBookingsClick}
+              className="bg-green-600 text-white p-2 sm:p-3 rounded-full shadow-lg hover:bg-green-700 transition-colors"
+              aria-label="Add new booking"
+            >
+              <PlusIcon className="h-5 w-5 sm:h-6 sm:w-6" />
+            </button>
+          )}
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
+
+export default FloatingButtons;
