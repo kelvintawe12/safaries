@@ -20,8 +20,8 @@ interface TourDetails {
 
 interface Tour {
   id: number;
-  title: string;
-  description: string;
+  title: { en: string; fr: string; rw: string };
+  description: { en: string; fr: string; rw: string };
   price: number;
   images: string[];
   duration: string;
@@ -209,57 +209,58 @@ const RegisterForm = ({ onProceed, onRegister }: { onProceed: () => void; onRegi
   );
 };
 
-const TourSlideshow = () => {
-  const [currentSlide, setCurrentSlide] = useState(0);
+  const TourSlideshow = () => {
+    const { language } = useLanguage();
+    const [currentSlide, setCurrentSlide] = useState(0);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % tours.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
+    useEffect(() => {
+      const interval = setInterval(() => {
+        setCurrentSlide((prev) => (prev + 1) % tours.length);
+      }, 5000);
+      return () => clearInterval(interval);
+    }, []);
 
-  const handlePrev = () => setCurrentSlide((prev) => (prev - 1 + tours.length) % tours.length);
-  const handleNext = () => setCurrentSlide((prev) => (prev + 1) % tours.length);
+    const handlePrev = () => setCurrentSlide((prev) => (prev - 1 + tours.length) % tours.length);
+    const handleNext = () => setCurrentSlide((prev) => (prev + 1) % tours.length);
 
-  return (
-    <div className="relative w-full max-w-4xl mx-auto mb-12">
-      <div className="overflow-hidden rounded-lg shadow-lg">
-        <div
-          className="flex transition-transform duration-500"
-          style={{ transform: `translateX(-${currentSlide * 100}%)` }}
-        >
-          {tours.map((tour) => (
-            <div
-              key={tour.id}
-              className="min-w-full h-96 bg-cover bg-center relative"
-              style={{ backgroundImage: `url(${tour.images[0] || 'https://via.placeholder.com/800x400'})` }}
-            >
-              <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-end p-6">
-                <h3 className="text-2xl font-bold text-white">{tour.title}</h3>
-                <p className="text-white">{tour.description.slice(0, 100)}...</p>
+    return (
+      <div className="relative w-full max-w-4xl mx-auto mb-12">
+        <div className="overflow-hidden rounded-lg shadow-lg">
+          <div
+            className="flex transition-transform duration-500"
+            style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+          >
+            {tours.map((tour) => (
+              <div
+                key={tour.id}
+                className="min-w-full h-96 bg-cover bg-center relative"
+                style={{ backgroundImage: `url(${tour.images[0] || '/people.jpg'})` }}
+              >
+                <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-end p-6">
+                  <h3 className="text-2xl font-bold text-white">{tour.title[language]}</h3>
+                  <p className="text-white">{tour.description[language].slice(0, 100)}...</p>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
+        <button
+          onClick={handlePrev}
+          className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-teal-600 text-white p-2 rounded-full hover:bg-teal-700 transition-colors transform hover:scale-110 duration-200"
+          aria-label="Previous slide"
+        >
+          ←
+        </button>
+        <button
+          onClick={handleNext}
+          className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-teal-600 text-white p-2 rounded-full hover:bg-teal-700 transition-colors transform hover:scale-110 duration-200"
+          aria-label="Next slide"
+        >
+          →
+        </button>
       </div>
-      <button
-        onClick={handlePrev}
-        className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-teal-600 text-white p-2 rounded-full hover:bg-teal-700 transition-colors transform hover:scale-110 duration-200"
-        aria-label="Previous slide"
-      >
-        ←
-      </button>
-      <button
-        onClick={handleNext}
-        className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-teal-600 text-white p-2 rounded-full hover:bg-teal-700 transition-colors transform hover:scale-110 duration-200"
-        aria-label="Next slide"
-      >
-        →
-      </button>
-    </div>
-  );
-};
+    );
+  };
 
 const Testimonials = () => {
   const testimonials = [
@@ -954,11 +955,6 @@ const BookingEntry = () => {
   }
 
   if (step === 'select-tour') {
-    const getTitle = (title: string | { en: string; fr: string; rw: string }) => {
-      if (typeof title === 'string') return title;
-      return title.en || 'Unknown Tour';
-    };
-
     return (
       <div className="min-h-screen bg-gray-100 py-8 px-4">
         <div className="max-w-5xl mx-auto">
@@ -973,7 +969,7 @@ const BookingEntry = () => {
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
                 <TourCard
-                  tour={{ ...tour, title: getTitle(tour.title) }}
+                  tour={tour}
                   onSelect={handleTourSelect}
                   clientDetails={clientDetails}
                 />
